@@ -1,0 +1,431 @@
+/* ======================================================================
+   काम खोजो — RESULTS PAGE (kaam/results.html)
+   ======================================================================
+   This is a SEPARATE standalone page (not injected like the other
+   sections) — reached after "छोड़ें / Skip" or after finishing the
+   post form in kaam.js's guided flow. It shows filter-wise profile/
+   job/vehicle cards in a premium, attractive card layout, and offers
+   a floating corner button so a visitor who skipped can still
+   register/post from here without going back.
+
+   Scoped entirely under #kaamResults so it never collides with
+   kaam.css (#kaam ...) or the shared css/style.css. Re-uses the same
+   design tokens (--accent, --green, --shadow, etc.) defined in
+   css/style.css's :root.
+   ====================================================================== */
+
+#kaamResults{
+  --accent:#C9973D;
+  --accent-light:#F6EAD0;
+  --premium-grad:linear-gradient(135deg,#DCAB4E 0%,var(--accent) 45%,#8A5A22 100%);
+  --glass-bg:rgba(255,255,255,.7);
+  min-height:100vh;
+  padding-bottom:110px;
+  position:relative;
+  background:
+    radial-gradient(680px 420px at 8% -6%, rgba(201,151,61,.14), transparent 60%),
+    radial-gradient(720px 480px at 108% 18%, rgba(138,90,34,.10), transparent 60%);
+}
+
+/* ---------- TOP BAR ----------
+   Structure/markup mirrors index.html's <header> (.navwrap/.mainnav/
+   .navbtn/.nav-right/.hamburger — all styled globally in css/style.css),
+   reused here as plain links back to ../index.html since this results
+   page is a standalone document outside the SPA's section switcher.
+   Only sticky positioning + shadow are kept local. */
+#kaamResults .kr-topbar{
+  position:sticky;top:0;z-index:60;
+  background:#fff;box-shadow:0 2px 14px rgba(43,29,14,.08);
+}
+#kaamResults .kr-topbar .navbtn.active{color:var(--accent);background:rgba(201,151,61,.1);}
+#kaamResults .kr-topbar .navbtn.active::after{background:var(--accent);}
+#kaamResults .kr-topbar .navbtn:hover{color:var(--accent);background:rgba(201,151,61,.06);}
+/* glass finish on top of the shared header, premium over flat white */
+#kaamResults .kr-topbar{background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);}
+
+/* ---------- HERO / HEADING ---------- */
+#kaamResults .kr-hero{
+  max-width:1180px;margin:0 auto;padding:40px 22px 6px;position:relative;
+}
+#kaamResults .kr-hero::before{
+  /* soft decorative glow behind the heading — premium accent touch */
+  content:"";position:absolute;top:-30px;left:22px;width:220px;height:220px;
+  background:radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%);
+  filter:blur(10px);pointer-events:none;z-index:-1;
+}
+#kaamResults .kr-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:8px;
+}
+#kaamResults .kr-eyebrow::before{content:"";width:20px;height:2px;border-radius:2px;background:var(--premium-grad);}
+#kaamResults .kr-hero h1{
+  font-size:clamp(24px,3.8vw,32px);margin-bottom:6px;
+  background:var(--premium-grad);-webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:.1px;
+}
+#kaamResults .kr-hero p{color:var(--ink-soft);font-size:14.5px;}
+#kaamResults .kr-intent-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 18px;border-radius:30px;
+  background:var(--glass-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid color-mix(in srgb, var(--accent) 35%, #fff);
+  box-shadow:0 8px 20px -8px rgba(43,29,14,.18);
+  font-size:13px;font-weight:700;color:#5a4110;
+}
+#kaamResults .kr-intent-badge button{
+  background:none;color:#5a4110;font-weight:800;text-decoration:underline;font-size:13px;
+}
+
+/* ---------- TABS + CHIPS ---------- */
+#kaamResults .kr-controls{
+  max-width:1180px;margin:18px auto 0;padding:18px 22px;
+  background:var(--glass-bg);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);
+  border:1px solid rgba(255,255,255,.6);border-radius:22px;
+  box-shadow:0 14px 34px -14px rgba(43,29,14,.18);
+}
+#kaamResults .kr-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+#kaamResults .kr-tab{
+  flex:1;min-width:150px;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.75);border:2px solid var(--cream2);
+  font-weight:700;font-size:13.5px;color:var(--ink-soft);transition:all .2s ease;
+}
+#kaamResults .kr-tab.active{
+  background:var(--premium-grad);
+  border-color:var(--accent);color:#fff;box-shadow:0 10px 22px -6px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+#kaamResults .kr-tab:hover{transform:translateY(-2px);}
+#kaamResults .kr-tab-count{
+  background:var(--accent-light);color:var(--accent);border-radius:20px;padding:1px 8px;font-size:11.5px;font-weight:800;
+}
+#kaamResults .kr-tab.active .kr-tab-count{background:rgba(255,255,255,.28);color:#fff;}
+
+#kaamResults .kr-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:0;}
+#kaamResults .kr-chip{
+  padding:9px 16px;border-radius:30px;background:rgba(255,255,255,.75);border:2px solid var(--cream2);
+  font-size:13.5px;font-weight:700;color:var(--ink-soft);transition:all .2s ease;
+}
+#kaamResults .kr-chip:hover{transform:translateY(-2px);border-color:var(--accent);}
+#kaamResults .kr-chip.active{
+  background:var(--premium-grad);
+  color:#fff;border-color:var(--accent);
+}
+
+/* ---------- SINGLE-INTENT MODE — when the visitor arrived via a
+     specific "register" choice (not skip/"show everything"), only the
+     matching tab/panel is relevant, so the other 3 stay hidden and the
+     tab-bar itself is hidden too (nothing to switch between). Mirrors
+     the same [data-intent] pattern kaam.css uses on the in-page widget. ---------- */
+#kaamResults[data-intent="worker"] .for-employer,
+#kaamResults[data-intent="worker"] .for-vehicle-need,
+#kaamResults[data-intent="worker"] .for-vehicle-give,
+#kaamResults[data-intent="employer"] .for-worker,
+#kaamResults[data-intent="employer"] .for-vehicle-need,
+#kaamResults[data-intent="employer"] .for-vehicle-give,
+#kaamResults[data-intent="vehicleNeed"] .for-worker,
+#kaamResults[data-intent="vehicleNeed"] .for-employer,
+#kaamResults[data-intent="vehicleNeed"] .for-vehicle-give,
+#kaamResults[data-intent="vehicleGive"] .for-worker,
+#kaamResults[data-intent="vehicleGive"] .for-employer,
+#kaamResults[data-intent="vehicleGive"] .for-vehicle-need { display:none !important; }
+
+#kaamResults[data-intent="worker"] #krTabs,
+#kaamResults[data-intent="employer"] #krTabs,
+#kaamResults[data-intent="vehicleNeed"] #krTabs,
+#kaamResults[data-intent="vehicleGive"] #krTabs { display:none; }
+
+#kaamResults[data-intent="both"] .kr-intent-badge #krShowAll { display:none; }
+
+/* ---------- PANELS + PREMIUM GRID ---------- */
+#kaamResults .kr-panel-wrap{max-width:1180px;margin:0 auto;padding:14px 22px 0;}
+#kaamResults .kr-panel{display:none;}
+#kaamResults .kr-panel.active{display:block;}
+#kaamResults .kr-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;margin-top:10px;
+}
+#kaamResults .kr-empty{text-align:center;color:var(--ink-soft);padding:50px 10px;font-size:15px;}
+
+/* ---------- PREMIUM PROFILE CARD ---------- */
+#kaamResults .kr-card{
+  position:relative;background:#fff;border-radius:20px;overflow:hidden;
+  border:1px solid color-mix(in srgb, var(--accent) 18%, #fff);
+  box-shadow:0 10px 26px rgba(43,29,14,.10);
+  display:flex;flex-direction:column;
+  transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease;
+  animation:kr-card-in .5s ease both;
+}
+#kaamResults .kr-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 24px 44px rgba(43,29,14,.20);
+  border-color:color-mix(in srgb, var(--accent) 55%, #fff);
+}
+@keyframes kr-card-in{
+  from{opacity:0;transform:translateY(14px) scale(.98);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+#kaamResults .kr-card-top{
+  position:relative;padding:22px 18px 46px;
+  background:linear-gradient(135deg,var(--tile,var(--accent)),color-mix(in srgb, var(--tile,var(--accent)) 55%, #000));
+}
+#kaamResults .kr-card-top::after{
+  /* soft sheen across the top banner for a "premium" glossy feel */
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 45%);
+  pointer-events:none;
+}
+#kaamResults .kr-badge-row{position:absolute;top:10px;left:14px;right:14px;display:flex;justify-content:space-between;gap:6px;}
+#kaamResults .kr-badge{
+  font-size:10.5px;font-weight:800;letter-spacing:.02em;padding:4px 10px;border-radius:20px;
+  background:rgba(255,255,255,.92);color:var(--ink);backdrop-filter:blur(2px);
+}
+#kaamResults .kr-badge.kr-badge-new{background:#FFD84D;color:#5a4204;}
+#kaamResults .kr-badge.kr-badge-verified{background:#fff;color:var(--green);}
+
+#kaamResults .kr-avatar{
+  width:72px;height:72px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #fff, var(--accent-light) 72%);
+  display:flex;align-items:center;justify-content:center;font-size:34px;
+  margin:6px auto 0;
+  border:3px solid rgba(255,255,255,.9);
+  box-shadow:0 8px 18px rgba(0,0,0,.22);
+}
+
+#kaamResults .kr-card-body{
+  padding:34px 16px 14px;margin-top:-26px;background:#fff;border-radius:22px 22px 0 0;
+  position:relative;flex:1;display:flex;flex-direction:column;text-align:center;
+}
+#kaamResults .kr-tag{
+  align-self:center;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+  background:var(--accent-light);color:#5a4110;margin-bottom:8px;
+}
+#kaamResults .kr-card-body h4{font-size:15.5px;line-height:1.3;color:var(--ink);margin-bottom:6px;min-height:40px;}
+#kaamResults .kr-meta{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+#kaamResults .kr-price{font-weight:800;color:var(--accent);font-size:18px;margin-bottom:8px;}
+#kaamResults .kr-price span{font-size:11.5px;font-weight:600;color:var(--ink-soft);}
+#kaamResults .kr-stars{color:#F2A93B;font-size:12px;letter-spacing:1px;margin-bottom:2px;}
+
+#kaamResults .kr-phone{
+  display:inline-flex;align-items:center;gap:5px;align-self:center;
+  font-size:13px;font-weight:700;color:var(--ink);
+  background:var(--accent-light);padding:4px 11px;border-radius:20px;
+  margin-top:2px;text-decoration:none;
+  transition:filter .2s ease;
+}
+#kaamResults .kr-phone:hover{filter:brightness(.96);}
+#kaamResults .kr-phone span{letter-spacing:.02em;}
+
+#kaamResults .kr-call{
+  display:block;margin:12px -16px -14px;padding:14px;text-align:center;
+  font-weight:800;font-size:14px;letter-spacing:.01em;color:#fff;
+  background:var(--premium-grad);
+  transition:filter .2s ease;
+}
+#kaamResults .kr-call:hover{filter:brightness(1.08);}
+
+/* ---------- LEFT-EDGE, VERTICALLY-CENTRED "POST AN AD" BUTTON ----------
+   Instagram/Facebook-style round icon bubble with its caption
+   stacked directly underneath (the Reels action-rail look), pinned
+   to the left edge, vertically centred on the screen — on desktop
+   AND on mobile. Two small tag badges (💼 काम / 🚜 गाड़ी) sit on the
+   icon itself, plus a "Work • Vehicle" sub-caption, so it reads
+   clearly as ONE button that posts either — no need to guess before
+   tapping. Bounces once on load so first-time visitors notice it. */
+#kaamResults .kr-fab{
+  position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:90;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:none;border:none;padding:0;cursor:pointer;
+  animation:kr-fab-in .5s cubic-bezier(.2,.9,.3,1) .3s both, kr-fab-bounce 2.8s ease 1.1s 1;
+  transition:transform .2s ease;
+}
+#kaamResults .kr-fab:hover{transform:translateY(-50%) translateY(-3px);}
+#kaamResults .kr-fab:active{transform:translateY(-50%) scale(.94);}
+
+#kaamResults .kr-fab-icon{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--premium-grad);
+  border:1px solid rgba(255,255,255,.4);
+  color:#fff;font-size:26px;line-height:1;font-weight:400;
+  box-shadow:0 10px 24px -6px color-mix(in srgb, var(--accent) 65%, transparent), 0 4px 12px rgba(0,0,0,.18);
+}
+#kaamResults .kr-fab-tag{
+  position:absolute;bottom:-4px;
+  width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;
+  background:#fff;border:1.5px solid var(--accent-light);
+  box-shadow:0 2px 6px rgba(0,0,0,.22);
+}
+#kaamResults .kr-fab-tag-work{left:-7px;}
+#kaamResults .kr-fab-tag-vehicle{right:-7px;}
+
+#kaamResults .kr-fab-label{
+  display:flex;flex-direction:column;align-items:center;line-height:1.15;
+  background:rgba(255,255,255,.9);padding:3px 9px;border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap;
+}
+#kaamResults .kr-fab-label-main{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:12px;color:var(--ink);}
+#kaamResults .kr-fab-label-sub{font-size:9.5px;font-weight:700;color:var(--accent);margin-top:1px;}
+
+#kaamResults .kr-fab-ring{
+  position:absolute;inset:-4px;border-radius:50%;
+  border:2px solid var(--accent);opacity:.6;pointer-events:none;
+  animation:kr-fab-pulse 2.4s ease-out .4s infinite;
+}
+
+@keyframes kr-fab-in{from{opacity:0;transform:translateY(-50%) translateX(-60px);}to{opacity:1;transform:translateY(-50%) translateX(0);}}
+@keyframes kr-fab-bounce{
+  0%,100%{transform:translateY(-50%) translateX(0);}
+  6%{transform:translateY(-50%) translateX(8px);}
+  13%{transform:translateY(-50%) translateX(0);}
+  19%{transform:translateY(-50%) translateX(4px);}
+  25%{transform:translateY(-50%) translateX(0);}
+}
+@keyframes kr-fab-pulse{
+  0%{transform:scale(1);opacity:.55;}
+  70%,100%{transform:scale(1.5);opacity:0;}
+}
+
+/* ---------- MOBILE: bottom floating pill, Instagram-style ----------
+   Below 640px this becomes a horizontal pill centred at the bottom
+   of the screen (same zone Instagram's own mobile "create" control
+   lives in) so it's within easy thumb reach and unmistakably the
+   primary action on the page. Desktop keeps the left-edge, vertically
+   centred version above. */
+@media (max-width:640px){
+  #kaamResults .kr-fab{
+    left:50%;top:auto;bottom:16px;transform:translateX(-50%);
+    flex-direction:row;gap:10px;
+    background:var(--premium-grad);
+    padding:8px 18px 8px 8px;border-radius:40px;
+    box-shadow:0 10px 26px -6px color-mix(in srgb, var(--accent) 65%, transparent), 0 4px 12px rgba(0,0,0,.2);
+    animation:kr-fab-in-m .5s cubic-bezier(.2,.9,.3,1) .3s both, kr-fab-bounce-m 2.8s ease 1.1s 1;
+  }
+  #kaamResults .kr-fab:hover,
+  #kaamResults .kr-fab:active{transform:translateX(-50%) scale(.97);}
+  #kaamResults .kr-fab-icon{
+    width:40px;height:40px;font-size:21px;
+    background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4);box-shadow:none;
+  }
+  #kaamResults .kr-fab-tag{width:17px;height:17px;font-size:9.5px;bottom:-3px;}
+  #kaamResults .kr-fab-tag-work{left:-6px;}
+  #kaamResults .kr-fab-tag-vehicle{right:-6px;}
+  #kaamResults .kr-fab-label{
+    align-items:flex-start;background:none;box-shadow:none;padding:0;
+  }
+  #kaamResults .kr-fab-label-main{color:#fff;font-size:13.5px;}
+  #kaamResults .kr-fab-label-sub{color:rgba(255,255,255,.9);}
+
+  @keyframes kr-fab-in-m{from{opacity:0;transform:translateX(-50%) translateY(70px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  @keyframes kr-fab-bounce-m{
+    0%,100%{transform:translateX(-50%) translateY(0);}
+    6%{transform:translateX(-50%) translateY(-8px);}
+    13%{transform:translateX(-50%) translateY(0);}
+    19%{transform:translateX(-50%) translateY(-4px);}
+    25%{transform:translateX(-50%) translateY(0);}
+  }
+}
+
+/* very narrow phones: drop the sub-caption to save width */
+@media (max-width:360px){
+  #kaamResults .kr-fab-label-sub{display:none;}
+}
+
+/* ---------- TOAST ---------- */
+#kaamResults .kr-toast{
+  position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:13px 22px;border-radius:30px;font-weight:700;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;z-index:200;box-shadow:0 10px 24px rgba(0,0,0,.25);
+}
+#kaamResults .kr-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ======================================================================
+   MODAL — same guided two-step post flow as kaam.js's modal, reproduced
+   here scoped to #kaamResults so this page never touches kaam.css.
+   ====================================================================== */
+#kaamResults .kr-modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(30,20,8,.6);z-index:300;
+  align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+#kaamResults .kr-modal-overlay.open{display:flex;animation:kr-fade .2s ease;}
+@keyframes kr-fade{from{opacity:0;}to{opacity:1;}}
+
+#kaamResults .kr-modal{
+  background:#fff;border-radius:26px;padding:34px 26px 26px;max-width:440px;width:100%;
+  max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 40px 80px rgba(0,0,0,.4);
+  scrollbar-width:none;
+}
+#kaamResults .kr-modal::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:5px;
+  background:var(--premium-grad);border-radius:26px 26px 0 0;
+}
+#kaamResults .kr-modal::-webkit-scrollbar{display:none;}
+#kaamResults .kr-modal-close{
+  position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;
+  background:var(--cream2);color:var(--ink-soft);font-size:16px;display:flex;align-items:center;justify-content:center;
+}
+#kaamResults .kr-modal-close:hover{background:var(--accent-light);color:var(--accent);}
+#kaamResults .kr-modal-skip{
+  position:absolute;top:18px;right:58px;font-size:12.5px;font-weight:800;color:var(--ink-soft);
+  padding:6px 12px;border-radius:20px;
+}
+#kaamResults .kr-modal-skip:hover{background:var(--accent-light);color:var(--accent);}
+#kaamResults .kr-modal h3{font-size:20px;color:var(--ink);padding-right:90px;}
+#kaamResults .kr-modal-sub{font-size:13px;color:var(--ink-soft);margin-top:4px;margin-bottom:16px;}
+
+#kaamResults .ki-field{margin-bottom:14px;}
+#kaamResults .ki-field label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+#kaamResults .ki-field select{
+  width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--cream2);font-size:14.5px;background:#fff;
+}
+#kaamResults .ki-field select:focus{outline:none;border-color:var(--accent);}
+#kaamResults .ki-divider{display:flex;align-items:center;gap:10px;margin:16px 0 14px;font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.03em;}
+#kaamResults .ki-divider::after{content:"";flex:1;height:1px;background:var(--cream2);}
+
+#kaamResults #krFormFields label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin:12px 0 6px;}
+#kaamResults #krFormFields input,#kaamResults #krFormFields select{
+  width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--cream2);font-size:14.5px;background:#fff;
+}
+#kaamResults #krFormFields input:focus,#kaamResults #krFormFields select:focus{outline:none;border-color:var(--accent);}
+#kaamResults .kr-form-row{display:grid;grid-template-columns:1.4fr 1fr;gap:10px;}
+
+#kaamResults .kr-cat-select{position:relative;}
+#kaamResults .kr-cat-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;
+  border-radius:12px;border:2px solid var(--cream2);background:#fff;font-size:14.5px;color:var(--ink);
+}
+#kaamResults .kr-cat-btn.open,#kaamResults .kr-cat-btn:focus{outline:none;border-color:var(--accent);}
+#kaamResults .kr-cat-panel{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border-radius:14px;
+  border:1px solid var(--cream2);box-shadow:0 16px 30px rgba(43,29,14,.18);max-height:230px;overflow-y:auto;z-index:20;padding:6px;
+}
+#kaamResults .kr-cat-group-label{
+  padding:8px 10px;margin:2px 0;font-size:11px;font-weight:800;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.03em;background:var(--accent-light);border-radius:8px;
+}
+#kaamResults .kr-cat-opt{width:100%;text-align:left;padding:10px 12px;border-radius:10px;font-size:14px;background:none;color:var(--ink);}
+#kaamResults .kr-cat-opt:hover{background:var(--accent-light);}
+#kaamResults .kr-cat-opt.active{background:var(--accent-light);color:var(--accent);font-weight:800;}
+
+#kaamResults .kr-loc-current-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:12px;
+  background:var(--premium-grad);color:#fff;font-weight:700;font-size:13.5px;margin-bottom:8px;
+}
+#kaamResults .kr-loc-status{font-size:12px;padding:6px 2px;border-radius:8px;margin-bottom:6px;}
+#kaamResults .kr-loc-status-loading{background:var(--accent-light);color:var(--accent);}
+#kaamResults .kr-loc-status-success{color:var(--green);}
+#kaamResults .kr-loc-status-error{color:var(--brick);}
+#kaamResults .kr-loc-divider{text-align:center;font-size:11.5px;color:var(--ink-soft);margin:6px 0;}
+
+#kaamResults .kr-submit-btn{
+  width:100%;margin-top:18px;padding:15px;border-radius:16px;font-weight:800;font-size:15.5px;color:#fff;
+  background:var(--premium-grad);
+  box-shadow:0 14px 26px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+#kaamResults .kr-submit-btn:hover{transform:translateY(-2px);}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:640px){
+  #kaamResults .kr-tabs{gap:8px;}
+  #kaamResults .kr-tab{min-width:44%;font-size:12.5px;padding:10px;}
+  #kaamResults .kr-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+}
