@@ -1,0 +1,296 @@
+/* ======================================================================
+   योजना खोजें (Yojna Khojo) — SECTION-ONLY STYLES
+   Every rule below is scoped under "#yojna" so it can only ever affect
+   this section — safe to add/change/delete without breaking किसान
+   साथी / काम खोजो / पशु साथी / समुदाय.
+
+   Uses the shared design tokens (--accent, --shadow, --cream2, etc.)
+   defined in :root inside css/style.css on purpose, so this section
+   keeps the same colors/fonts/spacing "feel" as the rest of the site.
+   Everything else needed to render this section is written here so
+   this file is self-contained (same pattern as kaam/kaam.css).
+
+   ⚠️ IMPORTANT FOR ANYONE EDITING THIS SECTION:
+   - ALL CSS for #yojna belongs in THIS file, and only this file.
+   - Do NOT add #yojna rules into css/style.css or any other section's
+     css file — even "just one quick line".
+   - Every new rule you write MUST start with "#yojna " so it stays
+     scoped to this section.
+   ====================================================================== */
+
+/* ---- TRUST STRIP ---- */
+#yojna .yj-trust-strip{
+  display: flex; flex-wrap: wrap; gap: 10px 22px;
+  margin: -6px 0 16px; padding: 0 2px;
+}
+#yojna .yj-trust-item{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 700; color: var(--ink-soft);
+}
+#yojna .yj-trust-ic{ font-size: 14px; }
+@media (max-width: 480px){
+  #yojna .yj-trust-strip{ gap: 8px 14px; margin-bottom: 12px; }
+  #yojna .yj-trust-item{ font-size: 11px; }
+}
+
+/* ---- SEARCH BOX ---- */
+#yojna .yj-search-wrap{
+  position: relative; display: flex; align-items: center;
+  background: #fff; border: 1.5px solid var(--cream2); border-radius: 14px;
+  box-shadow: var(--shadow); margin-bottom: 14px; padding: 0 6px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+#yojna .yj-search-wrap:focus-within{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+#yojna .yj-search-ic{ font-size: 15px; padding: 0 8px 0 10px; flex-shrink: 0; opacity: .7; }
+#yojna .yj-search-input{
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: 'Mukta', sans-serif; font-size: 14.5px; color: var(--ink);
+  padding: 13px 6px; min-width: 0;
+}
+#yojna .yj-search-input::placeholder{ color: var(--ink-soft); opacity: .65; }
+#yojna .yj-search-clear{
+  flex-shrink: 0; width: 26px; height: 26px; margin-right: 6px; border-radius: 50%;
+  background: var(--cream2); color: var(--ink-soft); font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+#yojna .yj-search-clear:hover{ background: var(--accent); color: #fff; }
+
+/* ---- CATEGORY FILTER BAR (ResultRush-style "phone mode" expandable filter) ----
+   Wraps the shared .chips/.chip classes (defined in css/style.css) so the
+   look/behaviour stays consistent with the rest of the site, while adding
+   the label row + mobile "सभी फ़िल्टर" expand toggle scoped to #yojna only. */
+#yojna .yj-filter-wrap {
+  background: #fff;
+  border: 1px solid var(--cream2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+#yojna .yj-filter-label-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+#yojna .yj-filter-label {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--ink-soft);
+}
+
+/* Expand toggle — dot-grid icon pill, mobile only */
+#yojna .yj-filter-expand-btn {
+  display: none;
+  align-items: center; gap: 5px;
+  background: transparent;
+  border: 1.5px solid var(--cream2);
+  border-radius: 8px;
+  padding: 0 9px; height: 30px;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color .15s ease, background .15s ease;
+}
+#yojna .yj-filter-expand-btn:hover,
+#yojna .yj-filter-expand-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
+}
+#yojna .yj-filter-expand-icon-grid {
+  display: grid; grid-template-columns: repeat(3, 4px); grid-template-rows: repeat(2, 4px);
+  gap: 3px; flex-shrink: 0;
+}
+#yojna .yj-filter-expand-icon-grid span {
+  display: block; width: 4px; height: 4px; border-radius: 1px;
+  background: var(--accent); transition: background .15s ease;
+}
+#yojna .yj-filter-expand-label {
+  font-size: 11.5px; font-weight: 700; color: var(--accent); white-space: nowrap; line-height: 1;
+}
+@media (max-width: 600px) {
+  #yojna .yj-filter-expand-btn { display: inline-flex; }
+}
+
+/* Default: single horizontally-scrollable row (mirrors rp-filter-bar) */
+#yojna .yj-filter-wrap .chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+  margin-bottom: 0;
+}
+#yojna .yj-filter-wrap .chips::-webkit-scrollbar { display: none; }
+#yojna .yj-filter-wrap .chip { flex-shrink: 0; white-space: nowrap; }
+
+@media (min-width: 601px) {
+  #yojna .yj-filter-wrap .chips { flex-wrap: wrap; overflow-x: visible; }
+}
+
+/* Expanded state (mobile "सभी फ़िल्टर" tapped) — wrap into a grid */
+#yojna .yj-filter-wrap .chips.yj-chips--expanded {
+  flex-wrap: wrap !important;
+  overflow-x: visible !important;
+}
+#yojna .yj-filter-wrap .chips.yj-chips--expanded .chip {
+  flex: 1 1 calc(33% - 7px);
+  text-align: center;
+  justify-content: center;
+}
+
+/* Brief highlight flash when a chip is selected via scroll-into-view */
+#yojna .chip--flash { animation: yj-chip-flash 0.9s ease; }
+@keyframes yj-chip-flash {
+  0%   { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent); }
+  100% { box-shadow: none; }
+}
+
+/* ---- COUNT + SORT META BAR ---- */
+#yojna .yj-meta-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  gap: 8px; margin: -6px 0 14px;
+}
+#yojna .yj-count {
+  font-size: 13px; font-weight: 700; color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, #fff);
+  padding: 5px 12px; border-radius: 20px;
+}
+#yojna .yj-sort { font-size: 12.5px; color: var(--ink-soft); }
+
+/* ---- SCHEME CARD GRID — square-ish cards with point-wise details ---- */
+#yojna .yj-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;
+}
+#yojna .yj-card {
+  background: #fff; border-radius: 18px; box-shadow: var(--shadow);
+  padding: 0 16px 14px; display: flex; flex-direction: column; position: relative;
+  min-height: 270px;
+  border: 1.5px solid var(--cream2);
+  border-left: 5px solid var(--tile, var(--accent));
+  transition: transform .2s ease, box-shadow .2s ease;
+  animation: yj-card-pop .4s ease both;
+  overflow: hidden;
+}
+@keyframes yj-card-pop { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+#yojna .yj-card:hover { transform: translateY(-5px); box-shadow: 0 16px 30px rgba(43,29,14,.18); }
+
+/* Tinted header strip behind icon+badges, so the card isn't flat white
+   top-to-bottom — colour reads immediately, before you even read text. */
+#yojna .yj-card-top {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin: 0 -16px; padding: 14px 16px 12px;
+  background: color-mix(in srgb, var(--tile, var(--accent)) 10%, #fff);
+}
+#yojna .yj-card-ic {
+  flex-shrink: 0; width: 44px; height: 44px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  background: linear-gradient(135deg, var(--tile, var(--accent)), color-mix(in srgb, var(--tile, var(--accent)) 55%, #000));
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
+#yojna .yj-card-badges { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+#yojna .yj-card-tag {
+  font-size: 10.5px; font-weight: 700; color: var(--ink-soft);
+  background: var(--cream2); padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+}
+#yojna .yj-card-new {
+  font-size: 10px; font-weight: 800; color: #5a4204; background: #FFD84D;
+  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+}
+#yojna .yj-card-urgent {
+  font-size: 10px; font-weight: 800; color: #fff; background: var(--brick);
+  padding: 3px 9px; border-radius: 20px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+#yojna .yj-card-urgent::before{ content:''; width:5px; height:5px; border-radius:50%; background:#fff; animation: yj-urgent-pulse 1.3s ease-in-out infinite; }
+@keyframes yj-urgent-pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+/* ---- BOOKMARK / SAVE — top-left of the icon tile, lets someone build
+   a shortlist of schemes to revisit without needing an account ---- */
+#yojna .yj-card-save{
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #fff; border: 1.5px solid var(--cream2);
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+  box-shadow: 0 3px 8px rgba(43,29,14,.1);
+  transition: transform .15s ease, border-color .15s ease;
+}
+#yojna .yj-card-save:hover{ transform: scale(1.08); }
+#yojna .yj-card-save.saved{ border-color: var(--saffron); }
+#yojna .yj-card-save .ic-off{ display: inline; }
+#yojna .yj-card-save .ic-on{ display: none; }
+#yojna .yj-card-save.saved .ic-off{ display: none; }
+#yojna .yj-card-save.saved .ic-on{ display: inline; }
+@media (max-width: 480px){
+  #yojna .yj-card-save{ top: 8px; right: 8px; width: 26px; height: 26px; font-size: 12px; }
+}
+#yojna .yj-card h4 {
+  font-size: 15px; line-height: 1.3; color: var(--ink); margin-top: 11px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* Point-wise details: benefit ✅ / eligibility ✔️ / last date 📅 —
+   each point gets a small colour-tinted icon badge instead of a bare
+   emoji, and the whole block sits in a soft tinted panel so the card
+   doesn't read as plain white bottom-to-top. */
+#yojna .yj-card .yj-points {
+  list-style: none; margin: 10px 0 0; padding: 10px 10px;
+  display: flex; flex-direction: column; gap: 8px; flex: 1;
+  background: color-mix(in srgb, var(--tile, var(--accent)) 6%, var(--cream) 40%);
+  border-radius: 12px;
+}
+#yojna .yj-card .yj-points li {
+  display: flex; align-items: flex-start; gap: 8px;
+}
+#yojna .yj-card .yj-points .yj-point-ic {
+  flex-shrink: 0; width: 20px; height: 20px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10.5px; line-height: 1; margin-top: 1px;
+  background: color-mix(in srgb, var(--tile, var(--accent)) 16%, #fff);
+}
+#yojna .yj-card .yj-points .yj-point-txt {
+  font-size: 11.8px; color: var(--ink-soft); line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+#yojna .yj-card .yj-points .yj-point-txt b { color: var(--ink); }
+
+#yojna .yj-card .yj-apply {
+  display: block; text-align: center; margin-top: 12px; padding: 9px; font-size: 13px;
+  font-weight: 700; border-radius: 12px; background: var(--tile, var(--accent)); color: #fff;
+  transition: filter .2s ease;
+}
+#yojna .yj-card .yj-apply:hover { filter: brightness(0.92); }
+
+/* ---- SKELETON LOADING CARDS — shown while /api/schemes is loading,
+   instead of a plain "लोड हो रहा है…" line, so the page feels fast and
+   the layout doesn't jump once real cards arrive. ---- */
+#yojna .yj-skel{
+  background: #fff; border-radius: 18px; box-shadow: var(--shadow);
+  padding: 16px; min-height: 270px; border: 1.5px solid var(--cream2);
+  display: flex; flex-direction: column; gap: 12px;
+}
+#yojna .yj-skel-row{
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--cream2) 25%, var(--cream) 37%, var(--cream2) 63%);
+  background-size: 400% 100%;
+  animation: yj-skel-shimmer 1.4s ease infinite;
+}
+#yojna .yj-skel-ic{ width: 44px; height: 44px; border-radius: 14px; }
+#yojna .yj-skel-title{ width: 80%; height: 15px; margin-top: 6px; }
+#yojna .yj-skel-line{ width: 100%; height: 11px; }
+#yojna .yj-skel-line.short{ width: 60%; }
+@keyframes yj-skel-shimmer{ 0%{background-position:100% 0;} 100%{background-position:-100% 0;} }
+@media (max-width: 480px){ #yojna .yj-skel{ min-height: 250px; padding: 12px; } }
+
+/* ---- LOAD MORE ---- */
+#yojna .yj-loadmore-wrap { text-align: center; margin-top: 22px; }
+#yojna .yj-loadmore-wrap .btn { padding: 11px 26px; }
+#yojna .yj-loadmore-wrap.hidden { display: none; }
+
+@media (max-width: 480px) {
+  #yojna .yj-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  #yojna .yj-card { padding: 0 12px 11px; border-radius: 16px; min-height: 250px; }
+  #yojna .yj-card-top { margin: 0 -12px; padding: 11px 12px 9px; }
+  #yojna .yj-card-ic { width: 36px; height: 36px; font-size: 18px; border-radius: 11px; }
+  #yojna .yj-card h4 { font-size: 12.5px; margin-top: 8px; }
+  #yojna .yj-card .yj-points { margin-top: 7px; padding: 8px; gap: 5px; }
+  #yojna .yj-card .yj-points .yj-point-txt { font-size: 10.5px; }
+}

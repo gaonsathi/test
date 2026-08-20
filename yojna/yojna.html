@@ -1,0 +1,92 @@
+<!--
+  ======================================================================
+  योजना खोजें (Yojna Khojo) — SECTION-ONLY FILE
+  ======================================================================
+  ⚠️ IMPORTANT FOR ANYONE EDITING THIS SECTION:
+  - This section's HTML lives ONLY here (yojna/yojna.html)
+  - This section's CSS lives ONLY in yojna/yojna.css
+  - This section's JS lives ONLY in yojna/yojna.js
+  Do NOT copy/move any of this section's markup, styles, or scripts
+  into the shared files (index.html body, css/style.css, js/script.js)
+  or into any other section's file. Same pattern as kaam/ — see the
+  note at the top of kaam/kaam.html if you want the full explanation.
+
+  Scheme CARDS are rendered by yojna.js from a JS data array (not
+  hardcoded here), so search/filter/sort/"load more" all work off one
+  source of truth. See the SCHEMES array at the top of yojna.js.
+  ======================================================================
+-->
+<section id="yojna" style="--accent:var(--sky);">
+  <div class="section-wrap">
+
+    <div class="section-banner reveal in">
+      <h2 data-en="📋 Find Schemes">📋 योजना खोजें</h2>
+      <p data-en="Search government schemes for farmers, women, students, elders and more — find the right one for you in seconds">किसान, महिला, छात्र, बुज़ुर्ग सबके लिए सरकारी योजनाएं — अपने लिए सही योजना कुछ ही सेकंड में खोजें</p>
+      <span class="big-ic">📋</span>
+    </div>
+
+    <!-- TRUST STRIP — three quick reassurances so a first-time visitor
+         trusts the list before they even start filtering, same idea as
+         the "verified / free / updated" strip on ResultRush.in. -->
+    <div class="yj-trust-strip reveal">
+      <span class="yj-trust-item"><span class="yj-trust-ic">✅</span><span data-en="100% Free Information">100% मुफ़्त जानकारी</span></span>
+      <span class="yj-trust-item"><span class="yj-trust-ic">🏛️</span><span data-en="Official Govt. Schemes Only">सिर्फ़ सरकारी योजनाएं</span></span>
+      <span class="yj-trust-item"><span class="yj-trust-ic">🔄</span><span data-en="Regularly Updated">नियमित अपडेट होती हैं</span></span>
+    </div>
+
+    <!-- SEARCH BOX — type-to-filter by name/benefit/eligibility, sits
+         above the category chips since typing a keyword is usually the
+         fastest path for someone who already knows what they're
+         looking for ("kisan", "ration", "beti" etc.) -->
+    <div class="yj-search-wrap reveal">
+      <span class="yj-search-ic" aria-hidden="true">🔍</span>
+      <input type="text" id="yjSearchInput" class="yj-search-input" autocomplete="off"
+             data-en-placeholder="Search schemes — e.g. farmer, ration, scholarship…"
+             placeholder="योजना खोजें — जैसे किसान, राशन, छात्रवृत्ति…">
+      <button type="button" id="yjSearchClearBtn" class="yj-search-clear" aria-label="Clear search" hidden>✕</button>
+    </div>
+
+    <!-- CATEGORY FILTER CHIPS — mobile "phone mode" expandable filter bar,
+         same pattern as ResultRush.in's schemes page (rp-filter-wrap /
+         rp-filter-expand-btn): single scrollable row by default, tap
+         "सभी फ़िल्टर" to expand into a full grid on small screens. -->
+    <div class="yj-filter-wrap">
+      <div class="yj-filter-label-row">
+        <span class="yj-filter-label" data-en="🔎 Filter by Category">🔎 श्रेणी के अनुसार फ़िल्टर करें</span>
+        <button type="button" class="yj-filter-expand-btn" id="yjFilterExpandBtn" aria-label="Show all filters" aria-expanded="false">
+          <span class="yj-filter-expand-label" id="yjFilterExpandLabel" data-en="All Filters">सभी फ़िल्टर</span>
+          <span class="yj-filter-expand-icon-grid" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+      </div>
+      <div class="chips" id="yojnaChips" role="group" aria-label="Filter schemes">
+        <button type="button" class="chip active" data-tag="all" data-en="All">सभी</button>
+        <button type="button" class="chip" data-tag="farmer" data-en="🌾 Farmer">🌾 किसान</button>
+        <button type="button" class="chip" data-tag="women" data-en="👩 Women">👩 महिला</button>
+        <button type="button" class="chip" data-tag="student" data-en="🎓 Student">🎓 छात्र</button>
+        <button type="button" class="chip" data-tag="elder" data-en="👴 Elderly">👴 बुज़ुर्ग</button>
+        <button type="button" class="chip" data-tag="health" data-en="🏥 Health">🏥 स्वास्थ्य</button>
+        <button type="button" class="chip" data-tag="housing" data-en="🏠 Housing">🏠 आवास</button>
+        <button type="button" class="chip" data-tag="employment" data-en="💼 Jobs &amp; Business">💼 रोज़गार</button>
+        <button type="button" class="chip" data-tag="welfare" data-en="🍚 Ration &amp; Welfare">🍚 राशन</button>
+        <button type="button" class="chip" data-tag="disability" data-en="♿ Disabled">♿ दिव्यांग</button>
+      </div>
+    </div>
+
+    <!-- COUNT + SORT -->
+    <div class="yj-meta-bar">
+      <span class="yj-count" id="yjCount">लोड हो रहा है…</span>
+      <span class="yj-sort" data-en="🆕 Newest First">🆕 नई सबसे पहले</span>
+    </div>
+
+    <div id="yojnaList" class="yj-grid"></div>
+    <p class="empty-msg" id="yojnaEmpty" hidden data-en="😕 No schemes found. Try a different filter.">😕 कोई योजना नहीं मिली। दूसरा फ़िल्टर आज़माएं।</p>
+
+    <div class="yj-loadmore-wrap" id="yjLoadMoreWrap">
+      <button type="button" class="btn outline" id="yjLoadMoreBtn" data-en="⬇ Show More Schemes">⬇ और योजनाएं देखें</button>
+    </div>
+
+  </div>
+</section>

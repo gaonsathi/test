@@ -1,0 +1,88 @@
+<!--
+  ======================================================================
+  समुदाय (Community) — SECTION-ONLY FILE
+  ======================================================================
+  ⚠️ IMPORTANT FOR ANYONE EDITING THIS SECTION:
+  - This section's HTML lives ONLY here (community/community.html)
+  - This section's CSS lives ONLY in community/community.css
+  - This section's JS lives ONLY in community/community.js
+  Do NOT copy/move any of this section's markup, styles, or scripts
+  into the shared files (index.html body, css/style.css, js/script.js)
+  or into any other section's file. Same isolation pattern as kaam/
+  and yojna/ — see the note at the top of kaam/kaam.html.
+
+  Kept deliberately SIMPLE on purpose — a normal chat wall, nothing
+  more: see the message stream, and a single WhatsApp/Instagram-style
+  bar at the bottom (camera icon + text box + send) to write one.
+  No section header, no tabs, no groups, no leaderboard, no events,
+  no stats counters, no search/filter chips. If you're adding a
+  feature here, ask first whether a villager would understand it in
+  5 seconds.
+
+  All ids here are namespaced "cm…" / "community…" on purpose so they
+  never collide with the old placeholder feed (#postFeed / #postText)
+  still sitting in js/script.js — that placeholder simply no-ops now
+  since those old ids no longer exist in the DOM.
+
+  ADDED: a tiny 2-tab bar (सभी पोस्ट / मेरी पोस्ट) at the top-center
+  so a villager who asked a question can find it again and see
+  whether anyone has replied yet ("उत्तर मिला" / "जवाब का इंतज़ार"
+  badge shown on their own posts). Kept to just 2 tabs on purpose —
+  same "would a villager get this in 5 seconds" bar as everything
+  else here.
+  ======================================================================
+-->
+<section id="community" style="--accent:var(--pink);">
+  <div class="section-wrap cm-wrap">
+
+    <!-- TABS — सभी पोस्ट (All Posts) / मेरी पोस्ट (My Posts), centered
+         at the top of the section, above the feed. -->
+    <div class="cm-tabs" role="tablist">
+      <button type="button" class="cm-tab active" id="cmTabAll" data-tab="all"
+        role="tab" aria-selected="true"
+        data-en="All Posts">सभी पोस्ट</button>
+      <button type="button" class="cm-tab" id="cmTabMine" data-tab="mine"
+        role="tab" aria-selected="false"
+        data-en="My Posts">मेरी पोस्ट</button>
+    </div>
+
+    <!-- CHAT FEED -->
+    <div id="cmFeedList"></div>
+    <p class="empty-msg" id="cmFeedEmpty" hidden></p>
+
+  </div>
+
+  <!-- COMPOSER BAR — fixed to the bottom of the screen at all times,
+       like WhatsApp/Instagram. Lives outside .section-wrap on purpose
+       so its own width/centering isn't affected by page scroll. -->
+  <div class="cm-composer-bar">
+    <div class="cm-composer-inner">
+
+      <!-- MEDIA PREVIEW — shown only after a photo/video is picked -->
+      <div class="cm-preview" id="cmPreview" hidden>
+        <img id="cmPreviewImg" alt="" hidden>
+        <video id="cmPreviewVid" controls hidden></video>
+        <button type="button" id="cmPreviewRemove" aria-label="Remove"
+          data-en-title="Remove" title="हटाएं">✕</button>
+      </div>
+
+      <!-- one line, like every other chat/social app:
+           camera/gallery icon · text box · send button -->
+      <div class="cm-composer">
+        <label class="cm-media-btn" for="cmMediaInput" aria-label="Photo / Video"
+          data-en-title="Photo / Video" title="फोटो / वीडियो">
+          <span class="ic">📷</span>
+        </label>
+        <input type="file" id="cmMediaInput" accept="image/*,video/*" hidden>
+
+        <input type="text" id="cmPostInput" autocomplete="off"
+          data-en-placeholder="Type a message…"
+          placeholder="मैसेज लिखें…">
+
+        <button type="button" class="cm-send-btn" id="cmPostBtn" aria-label="Send"
+          data-en-title="Send" title="भेजें">➤</button>
+      </div>
+
+    </div>
+  </div>
+</section>

@@ -1,0 +1,86 @@
+<div class="rate-shell" id="rateShell">
+  <div class="rate-head">
+    <div>
+      <div class="rate-eyebrow">🌾 <span data-en="LIVE FARM MARKET">LIVE FARM MARKET</span><span data-en="">किसान मंडी भाव</span></div>
+      <h2 data-en="Today's Crop Rates">आज का फसल भाव</h2>
+      <p data-en="Real mandi prices from the Government of India's AGMARKNET data.">भारत सरकार के AGMARKNET डेटा से असली मंडी भाव।</p>
+    </div>
+    <div class="rate-live-badge"><span class="rate-live-dot"></span><span data-en="Government data">सरकारी डेटा</span></div>
+  </div>
+
+  <div class="rate-tabs" id="rateTabs" role="tablist">
+    <button type="button" class="rate-tab active" data-rate-tab="mandi" role="tab" aria-selected="true">
+      <span class="rate-tab-ic">📍</span><span data-en="Mandi Rates">मंडी भाव</span>
+    </button>
+    <button type="button" class="rate-tab" data-rate-tab="msp" role="tab" aria-selected="false">
+      <span class="rate-tab-ic">🏛️</span><span data-en="Government MSP">सरकारी MSP</span>
+    </button>
+  </div>
+
+  <section class="rate-panel active" data-rate-panel="mandi">
+    <div class="rate-search-card">
+      <div class="rate-search-top">
+        <div>
+          <strong data-en="Find today's mandi price">आज का मंडी भाव खोजें</strong>
+          <span data-en="Select your location and crop">अपना राज्य और फसल चुनें</span>
+        </div>
+        <button type="button" class="rate-locate-btn" id="mandiLocateBtn"><span>⌖</span><span data-en="Use my location">मेरी लोकेशन</span></button>
+      </div>
+
+      <form class="rate-filters" id="mandiFilterForm">
+        <label class="rate-field">
+          <span data-en="State">राज्य</span>
+          <select id="mandiStateSelect" aria-label="State"></select>
+        </label>
+        <label class="rate-field">
+          <span data-en="Crop">फसल</span>
+          <select id="mandiCommoditySelect" aria-label="Crop"></select>
+        </label>
+        <button type="submit" class="rate-go-btn" id="mandiGoBtn"><span>Search</span><span data-en="Check rate">भाव देखें</span></button>
+      </form>
+      <div class="rate-locate-status" id="mandiLocateStatus" aria-live="polite"></div>
+    </div>
+
+    <div class="rate-results" id="mandiResults">
+      <div class="rate-empty">
+        <div class="rate-empty-icon">🌾</div>
+        <strong data-en="Your mandi price will appear here">आपका मंडी भाव यहां दिखेगा</strong>
+        <p data-en="Choose a state and crop, then tap Check rate.">राज्य और फसल चुनें, फिर भाव देखें दबाएं।</p>
+      </div>
+    </div>
+
+    <div class="rate-source-bar">
+      <span>✓ <span data-en="Source: AGMARKNET · data.gov.in">स्रोत: AGMARKNET · data.gov.in</span></span>
+      <span id="mandiUpdatedLabel"></span>
+      <button type="button" class="rate-refresh-btn" id="mandiRefreshBtn" title="Refresh">↻ <span data-en="Refresh">ताज़ा करें</span></button>
+    </div>
+    <div class="rate-links">
+      <a href="https://agmarknet.gov.in" target="_blank" rel="noopener noreferrer" data-en="Official AGMARKNET →">आधिकारिक AGMARKNET →</a>
+      <a href="https://www.data.gov.in" target="_blank" rel="noopener noreferrer" data-en="data.gov.in →">data.gov.in →</a>
+    </div>
+  </section>
+
+  <section class="rate-panel" data-rate-panel="msp">
+    <div class="rate-msp-head">
+      <div class="rate-msp-head-text">
+        <span class="rate-msp-icon">🏛️</span>
+        <div>
+          <strong data-en="Government Minimum Support Price">सरकारी न्यूनतम समर्थन मूल्य (MSP)</strong>
+          <span data-en="MSP is a government-set benchmark, not today's mandi price.">MSP सरकारी तय benchmark है, आज का मंडी भाव नहीं।</span>
+        </div>
+      </div>
+      <div class="rate-msp-subtabs" id="mspSubtabs" role="tablist">
+        <button type="button" class="rate-msp-subtab active" data-msp-season="kharif" role="tab" aria-selected="true">
+          <span class="rmt-ic">☀️</span><span data-en="Kharif">खरीफ</span>
+        </button>
+        <button type="button" class="rate-msp-subtab" data-msp-season="rabi" role="tab" aria-selected="false">
+          <span class="rmt-ic">❄️</span><span data-en="Rabi">रबी</span>
+        </button>
+      </div>
+    </div>
+    <div class="rate-msp-wrap" id="mspWrap">
+      <div class="rate-loading"><span class="rate-loading-spinner"></span><span data-en="Loading MSP...">MSP लोड हो रहा है...</span></div>
+    </div>
+    <div class="rate-attribution" id="mspAttribution" hidden><span id="mspSourceLabel"></span></div>
+  </section>
+</div>

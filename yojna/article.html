@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+  ======================================================================
+  योजना विवरण पेज (Scheme Article Page) — SECTION-ONLY FILE
+  ======================================================================
+  This is a STANDALONE page (not injected into index.html's SPA like
+  the other sections) — same as how a normal "read more" page works.
+  It is opened as: yojna/article.html?slug=SOME-SLUG
+
+  Content is NOT hardcoded here. It is fetched from the admin-controlled
+  API (server/server.js → GET /api/schemes/:slug) and rendered by
+  article.js. Admins add/edit schemes from admin/admin.html — no code
+  changes needed to publish a new scheme article.
+
+  Needs the small Gaon Sathi server running (see server/README / the
+  note in server/server.js) so /api/schemes/:slug is reachable. If the
+  server isn't running, this page shows a friendly "couldn't load"
+  message instead of breaking.
+  ======================================================================
+-->
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>योजना विवरण | Gaon Sathi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="article.css">
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<header>
+  <div class="navwrap">
+    <a class="logo" href="../index.html" style="text-decoration:none;">
+      <div class="mark">🌻</div>
+      <div>
+        <h1 data-en="Gaon Sathi">गाँव साथी</h1>
+        <span class="eng">GAON SATHI</span>
+      </div>
+    </a>
+    <!--
+      Same nav bar as the section pages (index.html), but as plain links
+      back to index.html#section — this page is standalone (not part of
+      the SPA's `main section` set), so there's nothing here for the
+      shared showSection() logic to switch between. "योजना खोजें" is
+      marked active since you're reading a scheme article. Menu
+      open/close (mobile) is handled by the small script at the bottom
+      of this file, not js/script.js (that file assumes #mainnav's
+      sibling `main section`s exist, which they don't on this page).
+    -->
+    <nav class="mainnav" id="mainnav">
+      <a class="navbtn" href="../index.html#home"><span class="ic">🏠</span><span data-en="Home">होम</span></a>
+      <a class="navbtn" href="../index.html#kisan"><span class="ic">🌾</span><span data-en="Kisan Sathi">किसान साथी</span></a>
+      <a class="navbtn" href="../index.html#kaam"><span class="ic">💼</span><span data-en="Find Work">काम खोजो</span></a>
+      <a class="navbtn" href="../index.html#pashu"><span class="ic">🐄</span><span data-en="Pashu Sathi">पशु साथी</span></a>
+      <a class="navbtn active" href="../index.html#yojna"><span class="ic">📋</span><span data-en="Find Schemes">योजना खोजें</span></a>
+      <a class="navbtn" href="../index.html#community"><span class="ic">👥</span><span data-en="Community">समुदाय</span></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / भाषा">
+        <button class="langbtn active" data-lang="hi">हिं</button>
+        <button class="langbtn" data-lang="en">EN</button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="nav-overlay" id="navOverlay"></div>
+</header>
+
+<main class="art-page" id="artWrap" style="--accent:var(--sky);">
+  <div class="art-skel" id="artLoading" aria-label="Loading" aria-busy="true">
+    <div class="art-skel-row art-skel-tag"></div>
+    <div class="art-skel-row art-skel-title"></div>
+    <div class="art-skel-row art-skel-title short"></div>
+    <div class="art-skel-row art-skel-line w60"></div>
+    <div class="art-skel-row art-skel-card"></div>
+    <div class="art-skel-row art-skel-line"></div>
+    <div class="art-skel-row art-skel-line w80"></div>
+    <div class="art-skel-row art-skel-line w60"></div>
+  </div>
+</main>
+
+<footer>
+  <h3>🌻 गाँव साथी</h3>
+  <p data-en="With every village, every home, every need — Gaon Sathi is with you.">हर गाँव, हर घर, हर ज़रूरत के साथ — Gaon Sathi आपके साथ है।</p>
+  <p class="eng">Made with ❤️ for Rural India</p>
+</footer>
+
+<script src="article.js"></script>
+<script src="../js/fx.js"></script>
+</body>
+</html>

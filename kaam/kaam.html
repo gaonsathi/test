@@ -1,0 +1,312 @@
+<!--
+  ======================================================================
+  काम खोजो (Kaam Khojo) — SECTION-ONLY FILE
+  ======================================================================
+  ⚠️ IMPORTANT FOR ANYONE EDITING THIS SECTION:
+  - This section's HTML lives ONLY here (kaam/kaam.html)
+  - This section's CSS lives ONLY in kaam/kaam.css
+  - This section's JS lives ONLY in kaam/kaam.js
+  Do NOT copy/move any of this section's markup, styles, or scripts
+  into the shared files (index.html body, css/style.css, js/script.js)
+  or into any other section's file. If you add a new element here that
+  needs styling or behaviour, write the CSS in kaam/kaam.css (scoped as
+  "#kaam ...") and the JS in kaam/kaam.js. This keeps this section fully
+  independent so it can be edited without touching anyone else's work.
+
+  Job/worker CARDS are rendered by kaam.js from JS data (not hardcoded
+  here) so that "Post a Job" / "Post yourself" actually adds a live
+  card to the grid. See the DATA arrays at the top of kaam.js.
+  ======================================================================
+-->
+<section id="kaam">
+
+<!-- ---------- KAAM KHOJO HERO SCENE — illustrated village work scene, same
+     animation technique as home's hero-scene (home/home.html), reimplemented
+     here (scoped #kaam) so this section stays fully self-contained. Placed
+     OUTSIDE .section-wrap (like home's .hero-scene) so it bleeds truly full
+     width — edge to edge of the browser, not just the 1180px content column.
+     The section heading lives INSIDE the scene as a caption over a dark
+     scrim (like Adobe/On-Running-style hero banners) instead of sitting
+     in a plain box below it. ---------- -->
+    <!-- ---------- FOLD: hero scene + highlights strip + intent picker are
+         wrapped together and height-locked to the viewport (see .kh-fold in
+         kaam.css) so the "शुरू करें / Start" button is always visible on
+         the first screen — no scrolling needed to reach it. ---------- -->
+    <div class="kh-fold" id="kaamFold">
+
+    <div class="kh-scene">
+      <div class="kh-scene-layer" id="khSceneLayer" aria-hidden="true">
+        <div class="kh-spotlight"></div>
+        <div class="kh-sun"></div>
+        <div class="kh-cloud khc1"></div>
+        <div class="kh-cloud khc2"></div>
+        <div class="kh-ground">
+          <div class="kh-hill khh2"></div>
+          <div class="kh-hill khh1"></div>
+        </div>
+        <span class="kh-dust kd1"></span>
+        <span class="kh-dust kd2"></span>
+        <span class="kh-dust kd3"></span>
+        <span class="kh-dust kd4"></span>
+        <span class="kh-dust kd5"></span>
+        <span class="kh-float kh-hammer">🔨</span>
+        <span class="kh-float kh-wrench">🔧</span>
+        <span class="kh-float kh-briefcase">💼</span>
+        <span class="kh-float kh-handshake">🤝</span>
+        <span class="kh-worker">🧑‍🔧</span>
+        <span class="kh-vehicle">🚜</span>
+      </div>
+      <div class="kh-scrim" aria-hidden="true"></div>
+      <div class="kh-scene-caption reveal in">
+        <h2 class="kh-heading" data-en="From Skill to Opportunity">कौशल से अवसर तक</h2>
+        <p class="kh-subheading" data-en="An initiative to connect your skills, labour needs, and farm vehicles/machines with the right person on a trusted platform.">आपके कौशल, मजदूर की जरूरत और खेती की गाड़ी/मशीन — सबको सही व्यक्ति से जोड़ने की पहल, एक विश्वसनीय मंच पर।</p>
+      </div>
+    </div>
+
+  <div class="section-wrap kh-fold-inner">
+
+<!-- ---------- HIGHLIGHTS STRIP — horizontally-scrollable single row so it
+     stays compact on every screen size (was a 6-row stack on mobile before,
+     which was the main reason the Start button needed a scroll to reach) ---------- -->
+    <div class="kaam-highlights-wrap">
+    <div class="kaam-highlights" id="kaamHighlights">
+      <div class="kh-item reveal in" style="--kh-color:var(--accent);--kh-tint:var(--accent-light);">
+        <span class="kh-num">01</span>
+        <span class="kh-ic">📍</span>
+        <div>
+          <h4 data-en="Local Opportunities">स्थानीय अवसर</h4>
+          <p data-en="Get information about work and employment opportunities available in your area.">अपने क्षेत्र में उपलब्ध कार्य एवं रोजगार के अवसरों की जानकारी प्राप्त करें।</p>
+        </div>
+      </div>
+      <div class="kh-item reveal in" style="--kh-color:var(--green);--kh-tint:var(--green-light);">
+        <span class="kh-num">02</span>
+        <span class="kh-ic">🧑‍🔧</span>
+        <div>
+          <h4 data-en="Find Work">काम खोजें</h4>
+          <p data-en="Looking for work? Browse jobs near you and get hired directly.">काम की तलाश है? अपने आसपास के काम देखें और सीधे संपर्क करें।</p>
+        </div>
+      </div>
+      <div class="kh-item reveal in" style="--kh-color:var(--sky);--kh-tint:var(--sky-light);">
+        <span class="kh-num">03</span>
+        <span class="kh-ic">📢</span>
+        <div>
+          <h4 data-en="Hire Workers">मजदूर बुलाएं</h4>
+          <p data-en="Need work done? Post your requirement and find the right worker fast.">काम करवाना है? अपनी आवश्यकता पोस्ट करें और सही मजदूर तुरंत पाएं।</p>
+        </div>
+      </div>
+      <div class="kh-item reveal in" style="--kh-color:var(--brick);--kh-tint:var(--brick-light);">
+        <span class="kh-num">04</span>
+        <span class="kh-ic">🚜</span>
+        <div>
+          <h4 data-en="Hire a Vehicle or Machine">गाड़ी/मशीन किराए पर लें</h4>
+          <p data-en="Need a tractor, truck, or thresher? Find one available near you.">ट्रैक्टर, ट्रक या थ्रेशर चाहिए? अपने पास उपलब्ध गाड़ी/मशीन खोजें।</p>
+        </div>
+      </div>
+      <div class="kh-item reveal in" style="--kh-color:var(--soil);--kh-tint:var(--soil-light);">
+        <span class="kh-num">05</span>
+        <span class="kh-ic">🚗</span>
+        <div>
+          <h4 data-en="Earn From Your Vehicle">अपनी गाड़ी से कमाएं</h4>
+          <p data-en="Own a vehicle or machine? List it on rent and reach people who need it.">आपके पास गाड़ी/मशीन है? किराए पर लगाएं और जरूरतमंद लोगों तक पहुंचें।</p>
+        </div>
+      </div>
+      <div class="kh-item reveal in" style="--kh-color:var(--pink);--kh-tint:var(--pink-light);">
+        <span class="kh-num">06</span>
+        <span class="kh-ic">🆓</span>
+        <div>
+          <h4 data-en="Completely Free">पूर्णतः निःशुल्क</h4>
+          <p data-en="Finding work, hiring workers, and renting vehicles are all free of charge.">काम खोजना, मजदूर बुलाना और गाड़ी किराए पर लेना — सब बिना किसी शुल्क के उपलब्ध है।</p>
+        </div>
+      </div>
+    </div>
+    </div><!-- /.kaam-highlights-wrap -->
+
+    <!-- ---------- INTENT PICKER: single entry point — start button reveals
+         the full content below (jobs, workers, vehicles — all 4 tabs) ---------- -->
+    <div class="intent-picker" id="kaamIntentPicker">
+      <h3 class="intent-title" data-en="Jobs, workers &amp; vehicles — all in one place">काम, मजदूर और गाड़ी — सबकुछ एक ही जगह</h3>
+      <p class="intent-sub" data-en="Tap start to see everything available near you">अपने आसपास उपलब्ध सबकुछ देखने के लिए शुरू करें दबाएं</p>
+      <button type="button" class="intent-start-btn" id="kaamIntentStart" onclick="openKaamGuidedModal()" data-en="Start →">शुरू करें →</button>
+    </div>
+
+  </div><!-- /.kh-fold-inner -->
+  </div><!-- /.kh-fold -->
+
+  <div class="section-wrap">
+
+    <!-- ---------- MAIN CONTENT: only shown after a choice is made ---------- -->
+    <div class="kaam-content" id="kaamContent" hidden>
+
+      <div class="intent-active-bar" id="kaamIntentBar">
+        <span id="kaamIntentBarText"></span>
+        <button type="button" id="kaamIntentChange" data-en="Change">🔄 बदलें</button>
+      </div>
+
+    <!-- ---------- TWO SECTIONS: काम दें (give work) / काम चाहिए (need work) ---------- -->
+    <div class="give-need-row">
+      <div class="give-need-card reveal for-employer">
+        <span class="gn-ic">📢</span>
+        <h3 data-en="I need workers">मुझे मजदूर चाहिए</h3>
+        <p data-en="Post a job — tell the village what work you need done">काम पोस्ट करें — गाँव को बताएं आपको क्या काम करवाना है</p>
+        <button class="btn" onclick="openKaamModal('job')" data-en="Post a Job">काम पोस्ट करें</button>
+      </div>
+      <div class="give-need-card reveal for-worker" style="--gn-color:var(--green);">
+        <span class="gn-ic">🧑‍🔧</span>
+        <h3 data-en="I am looking for work">मुझे काम चाहिए</h3>
+        <p data-en="Post yourself — let employers find and call you">अपनी जानकारी डालें — मालिक आपको खोजकर कॉल कर सकें</p>
+        <button class="btn" onclick="openKaamModal('worker')" data-en="Post Yourself">अपनी जानकारी दें</button>
+      </div>
+      <div class="give-need-card reveal for-vehicle-need" style="--gn-color:var(--sky);">
+        <span class="gn-ic">🚜</span>
+        <h3 data-en="I need a vehicle/machine">मुझे गाड़ी/मशीन चाहिए</h3>
+        <p data-en="Post your need — let vehicle owners find and call you">अपनी जरूरत बताएं — गाड़ी मालिक आपको खोजकर कॉल कर सकें</p>
+        <button class="btn" onclick="openKaamModal('vehicleRequest')" data-en="Post my Requirement">अपनी जरूरत बताएं</button>
+      </div>
+      <div class="give-need-card reveal for-vehicle-give" style="--gn-color:var(--brick);">
+        <span class="gn-ic">🚗</span>
+        <h3 data-en="I have a vehicle to give">मेरे पास गाड़ी है</h3>
+        <p data-en="Post your vehicle — let those who need it find and call you">अपनी गाड़ी पोस्ट करें — जरूरतमंद लोग आपको कॉल कर सकें</p>
+        <button class="btn" onclick="openKaamModal('vehicleOffer')" data-en="Post my Vehicle">अपनी गाड़ी पोस्ट करें</button>
+      </div>
+    </div>
+
+    <div class="search-row">
+      <input type="text" id="kaamSearch" placeholder="🔍 खोजें... जैसे: मिस्त्री, ड्राइवर, खेत मजदूर" data-en-placeholder="🔍 Search... e.g. mason, driver, farm labour">
+    </div>
+
+    <!-- ---------- TABS: Jobs vs Workers (only relevant when "सबकुछ दिखाएं" is chosen) ---------- -->
+    <div class="kaam-tabs" id="kaamTabs">
+      <button class="ktab active for-worker" data-panel="jobPanel">💼 <span data-en="Jobs Available">उपलब्ध काम</span><span class="ktab-count" id="jobsCount">0</span></button>
+      <button class="ktab for-employer" data-panel="workerPanel">🧑‍🔧 <span data-en="Workers Available">उपलब्ध मजदूर</span><span class="ktab-count" id="workersCount">0</span></button>
+      <button class="ktab for-vehicle-need" data-panel="vehicleOfferPanel">🚜 <span data-en="Vehicles Available">उपलब्ध गाड़ियां</span><span class="ktab-count" id="vehicleOffersCount">0</span></button>
+      <button class="ktab for-vehicle-give" data-panel="vehicleRequestPanel">📋 <span data-en="Vehicle Requests">गाड़ी की जरूरतें</span><span class="ktab-count" id="vehicleRequestsCount">0</span></button>
+    </div>
+
+    <!-- chip buttons are generated by kaam.js (renderChips) since the filter
+         categories change depending on whether काम/मजदूर or गाड़ी tab is active -->
+    <div class="chips" id="kaamChips"></div>
+
+    <!-- ---------- JOB GRID (posted by employers) — relevant to a worker looking for jobs ---------- -->
+    <div id="jobPanel" class="kaam-panel active for-worker">
+      <div id="jobList" class="product-grid"></div>
+      <p class="empty-msg" id="jobEmpty" hidden data-en="😕 No jobs found. Try a different search or filter.">😕 कोई काम नहीं मिला। दूसरा खोज या फ़िल्टर आज़माएं।</p>
+    </div>
+
+    <!-- ---------- WORKER GRID (posted by job-seekers) — relevant to an employer hiring ---------- -->
+    <div id="workerPanel" class="kaam-panel for-employer">
+      <div id="workerList" class="product-grid"></div>
+      <p class="empty-msg" id="workerEmpty" hidden data-en="😕 No workers found. Try a different search or filter.">😕 कोई मजदूर नहीं मिला। दूसरा खोज या फ़िल्टर आज़माएं।</p>
+    </div>
+
+    <!-- ---------- VEHICLE OFFER GRID (posted by vehicle owners) — relevant to someone needing a vehicle ---------- -->
+    <div id="vehicleOfferPanel" class="kaam-panel for-vehicle-need">
+      <div id="vehicleOfferList" class="product-grid"></div>
+      <p class="empty-msg" id="vehicleOfferEmpty" hidden data-en="😕 No vehicles found. Try a different search or filter.">😕 कोई गाड़ी नहीं मिली। दूसरा खोज या फ़िल्टर आज़माएं।</p>
+    </div>
+
+    <!-- ---------- VEHICLE REQUEST GRID (posted by people needing a vehicle) — relevant to a vehicle owner ---------- -->
+    <div id="vehicleRequestPanel" class="kaam-panel for-vehicle-give">
+      <div id="vehicleRequestList" class="product-grid"></div>
+      <p class="empty-msg" id="vehicleRequestEmpty" hidden data-en="😕 No requests found. Try a different search or filter.">😕 कोई जरूरत नहीं मिली। दूसरा खोज या फ़िल्टर आज़माएं।</p>
+    </div>
+
+    </div><!-- /#kaamContent -->
+
+  </div>
+
+  <!-- ---------- POST MODAL — also serves as the guided flow opened by the
+       "शुरू करें" button. When opened via openKaamGuidedModal(), the two-level
+       dropdown block (#kiPicker) shows first: dropdown 1 = "काम" / "गाड़ी",
+       dropdown 2 = the specific need (options change based on dropdown 1).
+       As soon as dropdown 2 is chosen, the detail fields below (#kaamFormFields)
+       reveal automatically, pre-configured for that choice. When opened
+       directly from a give/need card (openKaamModal(type)), #kiPicker stays
+       hidden since the type is already known, and the fields show right away —
+       same behaviour as before. ---------- -->
+  <div class="kaam-modal-overlay" id="kaamModalOverlay">
+    <div class="kaam-modal" role="dialog" aria-modal="true">
+      <button type="button" class="kaam-modal-skip" id="kaamModalSkip" onclick="skipKaamGuided()" hidden data-en="Skip →">छोड़ें →</button>
+      <button class="kaam-modal-close" onclick="closeKaamModal()" aria-label="Close">✕</button>
+      <h3 id="kaamModalTitle">काम पोस्ट करें</h3>
+      <p class="kaam-modal-sub" id="kaamModalSub">कुछ जानकारी भरें — बस एक मिनट लगेगा</p>
+
+      <!-- ---------- GUIDED PICKER (Start-button flow only) ---------- -->
+      <div class="ki-picker" id="kiPicker" hidden>
+        <div class="ki-field">
+          <label data-en="1. What is this about?">1️⃣ यह किससे जुड़ा है?</label>
+          <select id="kiMain">
+            <option value="" data-en="-- Select --">-- चुनें --</option>
+            <option value="work" data-en="🧑‍🔧 Work / Labour">🧑‍🔧 काम / मजदूर</option>
+            <option value="vehicle" data-en="🚜 Vehicle / Machine">🚜 गाड़ी / मशीन</option>
+          </select>
+        </div>
+
+        <div class="ki-field ki-reveal" id="kiSubField" hidden>
+          <label data-en="2. Choose one">2️⃣ आगे क्या चाहिए?</label>
+          <select id="kiSub">
+            <option value="" data-en="-- Select --">-- चुनें --</option>
+          </select>
+        </div>
+
+        <div class="ki-divider ki-reveal" id="kiDivider" hidden><span data-en="Your details">✍️ आपकी जानकारी</span></div>
+      </div>
+
+      <form id="kaamForm">
+        <div id="kaamFormFields">
+          <label id="labelTitle">आपका नाम</label>
+          <input type="text" id="fTitle" required placeholder="जैसे: सुरेश यादव" data-en-placeholder="e.g. Suresh Yadav">
+
+          <label data-en="Category">श्रेणी चुनें</label>
+          <div class="cat-select" id="catSelect">
+            <button type="button" class="cat-select-btn" id="catSelectBtn" aria-haspopup="listbox" aria-expanded="false">
+              <span id="catSelectLabel">-- चुनें --</span>
+              <span class="cat-select-arrow">▾</span>
+            </button>
+            <div class="cat-select-panel" id="catSelectPanel" role="listbox" hidden></div>
+            <!-- kept in the DOM (hidden) so all the existing value/.change
+                 logic in kaam.js keeps working untouched — the panel above
+                 is what the visitor actually sees and taps. -->
+            <select id="fCategory" class="cat-select-native" tabindex="-1" aria-hidden="true">
+              <option value="daily" data-en="☀️ Daily Work">☀️ रोज़ का काम</option>
+              <option value="skilled" data-en="🛠️ Skilled">🛠️ हुनरमंद</option>
+              <option value="women" data-en="👩 For Women">👩 महिलाओं के लिए</option>
+              <option value="near" data-en="📍 Nearby / Other">📍 पास में / अन्य</option>
+            </select>
+          </div>
+
+          <label data-en="Address / Location">पता / जगह</label>
+          <div class="loc-picker" id="locPicker">
+            <button type="button" class="loc-current-btn" id="locCurrentBtn">
+              <span class="loc-current-ic" id="locCurrentIc">📍</span>
+              <span id="locCurrentBtnText" data-en="Use my current location">मेरी वर्तमान लोकेशन का उपयोग करें</span>
+            </button>
+            <p class="loc-status" id="locStatus" hidden></p>
+            <div class="loc-divider"><span data-en="or type your address">या अपना पता खुद लिखें</span></div>
+            <input type="text" id="fPlace" required placeholder="जैसे: पूर्णिया, वार्ड नं. 5" data-en-placeholder="e.g. Purnia, Ward No. 5">
+          </div>
+
+          <div class="kaam-form-row" id="kaamWageRow">
+            <div>
+              <label id="labelWage">मजदूरी (₹)</label>
+              <input type="number" id="fWage" min="0" required placeholder="जैसे: 400" data-en-placeholder="e.g. 400">
+            </div>
+            <div>
+              <label data-en="Per">प्रति</label>
+              <select id="fUnit">
+                <option value="day" data-en="day">दिन</option>
+                <option value="month" data-en="month">माह</option>
+              </select>
+            </div>
+          </div>
+
+          <label data-en="Phone number">फ़ोन नंबर</label>
+          <input type="tel" id="fPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" data-en-placeholder="10-digit mobile number">
+        </div>
+
+        <button type="submit" class="btn kaam-submit-btn" id="kaamSubmitBtn">✅ अभी पोस्ट करें</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="kaam-toast" id="kaamToast"></div>
+</section>

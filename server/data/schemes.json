@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "kisan-credit-card-kcc",
+    "title": "किसान क्रेडिट कार्ड (KCC)",
+    "titleEn": "Kisan Credit Card (KCC)",
+    "tag": "farmer",
+    "icon": "💳",
+    "isNew": true,
+    "published": true,
+    "ministry": "कृषि एवं किसान कल्याण मंत्रालय",
+    "ministryEn": "Ministry of Agriculture & Farmers Welfare",
+    "oneLineSummary": "खेती के लिए बहुत कम ब्याज पर आसान लोन कार्ड — बीज, खाद, कीटनाशक खरीदने के लिए।",
+    "oneLineSummaryEn": "An easy, low-interest loan card for farming — to buy seeds, fertiliser and pesticides.",
+    "benefit": "₹3 लाख तक का लोन सिर्फ 4% ब्याज पर (समय पर चुकाने पर)",
+    "benefitEn": "Loan up to ₹3 lakh at just 4% interest (if repaid on time)",
+    "eligibility": "खुद की या पट्टे पर ली गई ज़मीन वाला कोई भी किसान\nपशुपालन व मछली पालन करने वाले किसान भी\nउम्र 18 से 75 वर्ष के बीच",
+    "eligibilityEn": "Any farmer with owned or leased land\nFarmers doing animal husbandry & fishery too\nAge between 18 and 75 years",
+    "documentsRequired": "आधार कार्ड\nपैन कार्ड\nज़मीन के कागज़ (खतौनी/खसरा)\nपासपोर्ट साइज़ फोटो\nबैंक पासबुक",
+    "documentsRequiredEn": "Aadhaar Card\nPAN Card\nLand documents (Khatauni/Khasra)\nPassport size photo\nBank passbook",
+    "howToApply": "अपनी नज़दीकी बैंक शाखा (SBI, PNB, या कोई भी सहकारी बैंक) में जाएं\nKCC आवेदन फॉर्म लें और भरें\nसाथ में ज़मीन के कागज़ और आधार कार्ड की कॉपी लगाएं\nबैंक जांच के बाद 2-3 हफ्तों में कार्ड मिल जाता है",
+    "howToApplyEn": "Visit your nearest bank branch (SBI, PNB, or any cooperative bank)\nCollect and fill the KCC application form\nAttach copies of land documents and Aadhaar card\nCard is issued within 2-3 weeks after bank verification",
+    "lastDate": "चालू — कभी भी आवेदन करें",
+    "lastDateEn": "Ongoing — apply anytime",
+    "officialLink": "https://www.pmkisan.gov.in",
+    "faqs": [
+      {
+        "q": "क्या बिना ज़मीन के किसान भी KCC ले सकते हैं?",
+        "qEn": "Can a farmer without land also get a KCC?",
+        "a": "हां, अगर आप पट्टे पर खेती करते हैं या पशुपालन/मछली पालन करते हैं तो भी आवेदन कर सकते हैं।",
+        "aEn": "Yes, if you farm on leased land or do animal husbandry/fishery, you can still apply."
+      },
+      {
+        "q": "क्या KCC कार्ड बनवाने की कोई फीस लगती है?",
+        "qEn": "Is there any fee to get a KCC card made?",
+        "a": "नहीं, ₹3 लाख तक के लोन पर कोई प्रोसेसिंग फीस नहीं ली जाती।",
+        "aEn": "No, there is no processing fee for loans up to ₹3 lakh."
+      }
+    ],
+    "createdAt": "2026-08-16T00:00:00.000Z",
+    "updatedAt": "2026-08-16T16:31:27.256Z",
+    "description": "किसान क्रेडिट कार्ड (KCC) एक ऐसा कार्ड है जो किसानों को खेती से जुड़े खर्चों — जैसे बीज, खाद, कीटनाशक और मज़दूरी — के लिए बैंक से आसानी से पैसा उधार लेने देता है। यह बिल्कुल डेबिट कार्ड की तरह काम करता है: बैंक आपकी ज़मीन और फसल के हिसाब से एक \"लिमिट\" तय करता है, और आप उतना पैसा जब चाहें निकाल सकते हैं और फसल बिकने के बाद वापस जमा कर सकते हैं। समय पर पैसा लौटाने पर ब्याज सिर्फ 4% सालाना रहता है, जो बाज़ार के सूदखोरों से कहीं कम है।",
+    "descriptionEn": "The Kisan Credit Card (KCC) lets farmers borrow money easily from a bank for farming costs — seeds, fertiliser, pesticides, and labour. It works much like a debit card: the bank sets a \"limit\" based on your land and crop, and you can withdraw money whenever you need it and repay after your crop is sold. If repaid on time, the interest is just 4% a year — far lower than what private moneylenders charge."
+  }
+]

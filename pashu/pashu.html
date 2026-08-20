@@ -1,0 +1,297 @@
+<section id="pashu" style="--accent:var(--soil);">
+
+  <!-- ---------- PASHU SATHI HERO — real photo (cows grazing in a green
+       pasture) instead of an illustrated CSS scene, so the section reads
+       as "animal care" at a glance. Styles live in pashu/pashu.css,
+       scoped as "#pashu ..." — do not move them into css/style.css. ---------- -->
+  <div class="ps-hero">
+    <div class="ps-photo"></div>
+    <div class="ps-vignette"></div>
+    <div class="ps-scrim"></div>
+    <div class="ps-badge"><span class="ps-dot"></span><span data-en="Vet care available">पशु चिकित्सा उपलब्ध</span></div>
+    <div class="ps-caption-wrap">
+      <div class="ps-caption">
+        <h2 data-en="Pashu Sathi">पशु साथी</h2>
+        <p data-en="Vaccination, doctor and care — all in one place">टीकाकरण, डॉक्टर और देखभाल — सब एक जगह</p>
+        <div class="ps-underline"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-wrap">
+
+    <!-- ============ SUB-SECTION SELECTOR (shown by default) ============
+         Same card-grid pattern as Kisan Sathi's 4-card selector
+         (kisan/kisan.html #ksubGrid) — mirrored here as psub-* so this
+         section stays self-contained inside pashu/, per the project's
+         "one folder per section" rule. ============ -->
+    <div class="psub-grid" id="psubGrid">
+
+      <div class="psub-card reveal in" data-psub-open="doctor" style="--psub-color:var(--green);--psub-tint:var(--green-light);">
+        <span class="psub-status live" data-en="Live">चालू</span>
+        <div class="psub-ic">🤖</div>
+        <h3 data-en="AI Pashu Doctor">AI पशु डॉक्टर</h3>
+        <p data-en="Describe your animal's problem — get instant care advice, plus vaccination reminders and a vet helpline">अपने पशु की समस्या बताएं — तुरंत सलाह पाएं, साथ ही टीकाकरण अनुस्मारक और डॉक्टर हेल्पलाइन</p>
+        <span class="psub-go" data-en="Open">खोलें →</span>
+      </div>
+
+      <div class="psub-card reveal in" data-psub-open="bazar" style="--psub-color:var(--saffron);--psub-tint:var(--cream2);">
+        <span class="psub-status live" data-en="Live">चालू</span>
+        <div class="psub-ic">🛒</div>
+        <h3 data-en="Pashu Bazar">पशु बाज़ार</h3>
+        <p data-en="Buy and sell cows and buffaloes directly with nearby farmers — no middlemen">गाय और भैंस सीधे आस-पास के किसानों से खरीदें-बेचें — कोई बिचौलिया नहीं</p>
+        <span class="psub-go" data-en="Open">खोलें →</span>
+      </div>
+
+    </div>
+
+    <!-- ============ SUB-SECTION: AI PASHU DOCTOR ============ -->
+    <div class="psub-panel" data-psub-panel="doctor">
+      <button class="psub-back" data-psub-back>
+        <span>←</span> <span data-en="All Pashu Sathi tools">पशु साथी के सभी टूल</span>
+      </button>
+
+      <h3 style="margin-bottom:12px;" data-en="Choose your animal">अपना पशु चुनें</h3>
+      <div class="chips">
+        <button class="chip active" data-en="🐄 Cow">🐄 गाय</button>
+        <button class="chip" data-en="🐃 Buffalo">🐃 भैंस</button>
+        <button class="chip" data-en="🐐 Goat">🐐 बकरी</button>
+        <button class="chip" data-en="🐔 Poultry">🐔 मुर्गी</button>
+      </div>
+
+      <div class="grid2" style="margin-bottom:18px;">
+        <div class="card reveal" style="border-left-color:#2E8B57;">
+          <h3 data-en="📞 Vet Helpline">📞 पशु डॉक्टर हेल्पलाइन</h3>
+          <p style="color:var(--ink-soft);margin:8px 0;" data-en="Call for free 24x7 advice">24x7 मुफ्त सलाह के लिए कॉल करें</p>
+          <a class="btn" style="background:#2E8B57;" data-en="Call 1800-XXX-XXXX">1800-XXX-XXXX पर कॉल करें</a>
+        </div>
+        <div class="card reveal">
+          <h3 data-en="💉 Vaccination Reminder">💉 टीकाकरण अनुस्मारक</h3>
+          <p style="margin-top:8px;font-size:14px;" data-en="<b>Cow — FMD:</b> Next vaccine 15 September"><b>गाय — खुरपका मुँहपका:</b> अगला टीका 15 सितंबर</p>
+          <p style="margin-top:4px;font-size:14px;" data-en="<b>Goat — PPR:</b> Next vaccine 2 October"><b>बकरी — पीपीआर:</b> अगला टीका 2 अक्टूबर</p>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom:14px;" data-en="🩺 Common Illnesses">🩺 सामान्य बीमारियाँ</h3>
+      <div class="grid3" style="margin-bottom:24px;">
+        <div class="card reveal"><h4 data-en="🌡️ Fever & lethargy">🌡️ बुखार व सुस्ती</h4><p style="margin-top:6px;font-size:14px;color:var(--ink-soft);" data-en="Give water immediately, keep in a cool place, call a doctor.">तुरंत पानी दें, ठंडी जगह रखें, डॉक्टर बुलाएं।</p></div>
+        <div class="card reveal"><h4 data-en="🤢 Bloating">🤢 पेट फूलना</h4><p style="margin-top:6px;font-size:14px;color:var(--ink-soft);" data-en="Stop green fodder right away, show to a vet.">हरा चारा तुरंत रोकें, पशु चिकित्सक को दिखाएं।</p></div>
+        <div class="card reveal"><h4 data-en="🦶 Hoof swelling">🦶 खुर में सूजन</h4><p style="margin-top:6px;font-size:14px;color:var(--ink-soft);" data-en="Keep in a dry place, clean the wound with fresh water.">सूखी जगह रखें, घाव को साफ पानी से धोएं।</p></div>
+      </div>
+
+      <div class="card reveal">
+        <h3 data-en="🎤 Ask the Doctor">🎤 डॉक्टर से पूछें</h3>
+        <textarea id="pashuQ" placeholder="जैसे: मेरी गाय दूध कम दे रही है, क्या करूं?" data-en-placeholder="e.g. My cow is giving less milk, what should I do?" style="margin-top:10px;"></textarea>
+        <button class="btn" style="margin-top:10px;background:var(--soil);" onclick="askExpert('pashuQ','pashuA')">भेजें / Send</button>
+        <div class="ask-response" id="pashuA" style="background:var(--soil-light);color:var(--soil);" data-en="Thank you! Our vet will reply soon. 🐄">धन्यवाद! हमारा पशु चिकित्सक जल्द जवाब देगा। 🐄</div>
+      </div>
+    </div>
+
+    <!-- ============ SUB-SECTION: PASHU BAZAR ============
+         Listing cards with a seller row, distance & stat pills, quick
+         Chat/WhatsApp/Call actions, a fixed "sell" FAB, and a
+         buyer-safety tips card. Cow-photo hero is hidden while this
+         panel is open (see pashu.js openPsub). ============ -->
+    <div class="psub-panel pbazar-panel" data-psub-panel="bazar">
+      <button class="psub-back psub-back-fab" data-psub-back aria-label="वापस जाएं">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+
+      <div class="chips pbazar-filter" id="bazarChips">
+        <button class="chip active" data-bazar-filter="all" data-en="All">सभी</button>
+        <button class="chip" data-bazar-filter="cow" data-en="🐄 Cow">🐄 गाय</button>
+        <button class="chip" data-bazar-filter="buffalo" data-en="🐃 Buffalo">🐃 भैंस</button>
+      </div>
+
+      <button type="button" class="pbazar-sell-fab" id="bazarSellFab" aria-haspopup="dialog" aria-controls="bazarSellModal">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span data-en="Sell your animal">पशु बेचें</span>
+      </button>
+
+      <div class="bazar-grid" id="bazarList" style="margin-bottom:30px;">
+
+        <div class="bazar-card reveal in" data-bazar-item="cow" style="--bz-color:var(--green);--bz-tint:var(--green-light);">
+          <div class="bazar-photo">🐄<span class="bazar-dist" data-en="3 km away">3 किमी दूर</span></div>
+          <div class="bazar-body">
+            <span class="tag" style="--tag-bg:var(--green-light);color:var(--green);" data-en="Cow">गाय</span>
+            <h4 data-en="Sahiwal Cow, gives 12L milk/day">साहीवाल गाय, 12 लीटर दूध/दिन</h4>
+            <div class="bazar-stats">
+              <span>🎂 4 <span data-en="yrs">साल</span></span>
+              <span>🥛 12 L/<span data-en="day">दिन</span></span>
+              <span class="bazar-status" data-en="Milking">दूध दे रही</span>
+            </div>
+            <div class="bazar-seller">
+              <span class="bazar-avatar">RK</span>
+              <span data-en="Ramesh Kumar · Verified">रमेश कुमार · वेरिफाइड ✓</span>
+            </div>
+          </div>
+          <div class="bazar-side">
+            <p class="price">₹55,000</p>
+            <p class="bazar-loc" data-en="Muzaffarpur, Bihar">मुज़फ़्फ़रपुर, बिहार</p>
+            <div class="bazar-actions">
+              <a class="bazar-act wa" title="WhatsApp" data-en="💬 WhatsApp">💬 WhatsApp</a>
+              <a class="bazar-act call" title="Call" data-en="📞 Call Now">📞 कॉल करें</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bazar-card reveal in" data-bazar-item="buffalo" style="--bz-color:var(--sky);--bz-tint:var(--sky-light);">
+          <div class="bazar-photo">🐃<span class="bazar-dist" data-en="5 km away">5 किमी दूर</span></div>
+          <div class="bazar-body">
+            <span class="tag" style="--tag-bg:var(--sky-light);color:var(--sky);" data-en="Buffalo">भैंस</span>
+            <h4 data-en="Murrah Buffalo, healthy &amp; pregnant">मुर्रा भैंस, स्वस्थ व गाभिन</h4>
+            <div class="bazar-stats">
+              <span>🎂 3 <span data-en="yrs">साल</span></span>
+              <span>🥛 18 L/<span data-en="day">दिन</span></span>
+              <span class="bazar-status preg" data-en="Pregnant">गाभिन</span>
+            </div>
+            <div class="bazar-seller">
+              <span class="bazar-avatar">SD</span>
+              <span data-en="Suresh Devi · Verified">सुरेश देवी · वेरिफाइड ✓</span>
+            </div>
+          </div>
+          <div class="bazar-side">
+            <p class="price">₹80,000</p>
+            <p class="bazar-loc" data-en="Karnal, Haryana">करनाल, हरियाणा</p>
+            <div class="bazar-actions">
+              <a class="bazar-act wa" title="WhatsApp" data-en="💬 WhatsApp">💬 WhatsApp</a>
+              <a class="bazar-act call" title="Call" data-en="📞 Call Now">📞 कॉल करें</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="bazar-card reveal in" data-bazar-item="cow" style="--bz-color:var(--green);--bz-tint:var(--green-light);">
+          <div class="bazar-photo">🐄<span class="bazar-dist" data-en="9 km away">9 किमी दूर</span></div>
+          <div class="bazar-body">
+            <span class="tag" style="--tag-bg:var(--green-light);color:var(--green);" data-en="Cow">गाय</span>
+            <h4 data-en="Gir Cow calf, A2 milk breed">गिर गाय का बछड़ा, A2 दूध नस्ल</h4>
+            <div class="bazar-stats">
+              <span>🎂 6 <span data-en="months">महीने</span></span>
+              <span class="bazar-status" data-en="Healthy">स्वस्थ</span>
+            </div>
+            <div class="bazar-seller">
+              <span class="bazar-avatar">JP</span>
+              <span data-en="Jayesh Patel · Verified">जयेश पटेल · वेरिफाइड ✓</span>
+            </div>
+          </div>
+          <div class="bazar-side">
+            <p class="price">₹35,000</p>
+            <p class="bazar-loc" data-en="Rajkot, Gujarat">राजकोट, गुजरात</p>
+            <div class="bazar-actions">
+              <a class="bazar-act wa" title="WhatsApp" data-en="💬 WhatsApp">💬 WhatsApp</a>
+              <a class="bazar-act call" title="Call" data-en="📞 Call Now">📞 कॉल करें</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ---- "sell your animal" popup — opened by the pbazar-sell-fab
+           button. Same fields as before (category, photos, breed/age/
+           milk/weight, price, location, status, seller contact) — just
+           moved into a modal instead of sitting inline in the page.
+           Category limited to Cow/Buffalo to match the bazar's current
+           listing categories. Submit logic lives in pashu.js §3. ---- -->
+      <div class="pbazar-modal" id="bazarSellModal" hidden role="dialog" aria-modal="true" aria-labelledby="bazarSellModalTitle">
+        <div class="pbazar-modal-backdrop" data-modal-close></div>
+        <div class="pbazar-modal-panel">
+          <button type="button" class="pbazar-modal-close" data-modal-close aria-label="बंद करें">×</button>
+
+          <h3 id="bazarSellModalTitle" data-en="📢 List your animal for sale">📢 अपना पशु बेचने के लिए डालें</h3>
+          <p style="color:var(--ink-soft);margin:8px 0 16px;font-size:14px;" data-en="Add a few details — nearby buyers will contact you directly, no dalal">कुछ जानकारी भरें — आस-पास के खरीदार सीधे आपसे संपर्क करेंगे, कोई दलाल नहीं</p>
+
+          <p class="pbazar-label" data-en="Category">श्रेणी</p>
+          <div class="chips" id="bazarCatChips" style="margin-bottom:18px;">
+            <button type="button" class="chip active" data-cat="cow" data-en="🐄 Cow">🐄 गाय</button>
+            <button type="button" class="chip" data-cat="buffalo" data-en="🐃 Buffalo">🐃 भैंस</button>
+          </div>
+
+          <p class="pbazar-label" data-en="Photos (up to 4) — listings with photos sell faster">फोटो (अधिकतम 4) — फोटो वाली लिस्टिंग जल्दी बिकती है</p>
+          <div class="pbazar-photo-upload" id="bazarPhotoUpload">
+            <label class="pbazar-photo-add" for="bazarPhotoInput">
+              <span class="pbazar-photo-add-ic">📷</span>
+              <span data-en="Add photo">फोटो जोड़ें</span>
+            </label>
+            <input type="file" id="bazarPhotoInput" accept="image/*" capture="environment" multiple hidden>
+          </div>
+
+          <div class="pbazar-formgrid" style="margin-top:16px;">
+            <div>
+              <label for="bazarBreed" data-en="Breed">नस्ल</label>
+              <input type="text" id="bazarBreed" placeholder="जैसे: साहीवाल, मुर्रा" data-en-placeholder="e.g. Sahiwal, Murrah">
+            </div>
+            <div>
+              <label for="bazarAge" data-en="Age">उम्र</label>
+              <input type="text" id="bazarAge" placeholder="जैसे: 4 साल" data-en-placeholder="e.g. 4 years">
+            </div>
+            <div id="bazarMilkField">
+              <label for="bazarMilk" data-en="Milk (L/day)">दूध (लीटर/दिन)</label>
+              <input type="text" id="bazarMilk" placeholder="जैसे: 12" data-en-placeholder="e.g. 12">
+            </div>
+            <div id="bazarWeightField" style="display:none;">
+              <label for="bazarWeight" data-en="Weight (kg)">वज़न (किलो)</label>
+              <input type="text" id="bazarWeight" placeholder="जैसे: 25" data-en-placeholder="e.g. 25">
+            </div>
+            <div>
+              <label for="bazarPrice" data-en="Price (₹)">कीमत (₹)</label>
+              <input type="text" id="bazarPrice" placeholder="जैसे: 45,000" data-en-placeholder="e.g. 45,000">
+            </div>
+            <div>
+              <label for="bazarLoc" data-en="Village / location">गाँव / जगह</label>
+              <input type="text" id="bazarLoc" placeholder="जैसे: मुज़फ़्फ़रपुर, बिहार" data-en-placeholder="e.g. your village, district">
+            </div>
+          </div>
+
+          <button type="button" class="loc-current-btn" id="bazarLocBtn" style="margin-top:12px;">
+            <span class="loc-current-ic" id="bazarLocIc">📍</span>
+            <span id="bazarLocBtnText" data-en="Use my current location">मेरी वर्तमान लोकेशन का उपयोग करें</span>
+          </button>
+          <p class="loc-status" id="bazarLocStatus" hidden></p>
+
+          <p class="pbazar-label" style="margin-top:16px;" data-en="Status">स्थिति</p>
+          <div class="chips" id="bazarStatusChips" style="margin-bottom:16px;">
+            <button type="button" class="chip active" data-status="milking" data-en="Milking">दूध दे रही</button>
+            <button type="button" class="chip" data-status="dry" data-en="Dry">सूखी</button>
+            <button type="button" class="chip" data-status="pregnant" data-en="Pregnant">गाभिन</button>
+            <button type="button" class="chip" data-status="healthy" data-en="Healthy">स्वस्थ</button>
+          </div>
+
+          <div class="pbazar-formgrid">
+            <div>
+              <label for="bazarSellerName" data-en="Your name">आपका नाम</label>
+              <input type="text" id="bazarSellerName" placeholder="जैसे: रमेश कुमार" data-en-placeholder="e.g. Ramesh Kumar">
+            </div>
+            <div>
+              <label for="bazarSellerPhone" data-en="Phone / WhatsApp number">फ़ोन / WhatsApp नंबर</label>
+              <input type="tel" id="bazarSellerPhone" maxlength="10" inputmode="numeric" placeholder="जैसे: 98765xxxxx" data-en-placeholder="e.g. 98765xxxxx">
+            </div>
+          </div>
+
+          <label for="bazarSellInfo" style="display:block;margin-top:14px;" data-en="Other details">अन्य जानकारी</label>
+          <textarea id="bazarSellInfo" placeholder="जैसे: ब्यांत संख्या, फोटो/वीडियो भेजने का तरीका" data-en-placeholder="e.g. lactation number, anything else buyers should know" style="margin-top:6px;"></textarea>
+          <button class="btn" id="bazarSellBtn" style="margin-top:12px;background:var(--saffron);" data-en="Post listing">लिस्टिंग डालें</button>
+          <div class="ask-response" id="bazarSellResp" style="background:var(--cream2);color:var(--saffron-dark);" data-en="Thank you! Your listing is live — buyers can now reach out to you. 🐄">धन्यवाद! आपकी लिस्टिंग चालू हो गई है — खरीदार अब आपसे संपर्क कर सकते हैं। 🐄</div>
+        </div>
+      </div>
+
+      <!-- ---- buyer safety tips ---- -->
+      <div class="pbazar-tips reveal">
+        <h3 data-en="🛡️ Before you buy, remember">🛡️ खरीदने से पहले ये याद रखें</h3>
+        <div class="pbazar-tips-grid">
+          <div><span>1</span><p data-en="Never send advance money before seeing the animal in person">पशु देखे बिना कभी भी एडवांस पैसे न भेजें</p></div>
+          <div><span>2</span><p data-en="Milk it yourself once to check the real yield">दूध खुद निकालकर असली मात्रा जांच लें</p></div>
+          <div><span>3</span><p data-en="Visit only in daylight, and take someone along">हमेशा दिन में जाएं, अकेले न जाएं</p></div>
+          <div><span>4</span><p data-en="Ask for a vet health check-up, especially if pregnant">पशु चिकित्सक से जांच जरूर करवाएं, खासकर गाभिन हो तो</p></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,184 @@
+/* ===== Kisan Sathi — section-only styles (v2, premium rebuild) ===== */
+
+/* fix: any [hidden] element inside this section must actually disappear —
+   without this, elements with an explicit "display" rule (like .upload-preview)
+   override the browser's default [hidden]{display:none}, leaving an empty/blank box visible */
+#kisan [hidden]{display:none !important;}
+
+/* keep the sticky site header from covering the top of this section
+   (its wa-header / sidebar brand) when JS scrolls #kisan into view */
+#kisan{scroll-margin-top:73px;}
+
+/* ---------- WHY KISAN SATHI — highlights band (static info, premium editorial look) ---------- */
+.kisan-highlights{
+  position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:0;margin:34px 0 6px;cursor:default;
+  background:
+    radial-gradient(600px 200px at 15% 0%, rgba(45,106,79,0.05), transparent 60%),
+    radial-gradient(600px 200px at 85% 100%, rgba(46,155,201,0.05), transparent 60%),
+    linear-gradient(180deg,#fff,var(--cream) 130%);
+  border-radius:24px;box-shadow:var(--shadow);
+  border:1px solid rgba(43,29,14,0.06);overflow:hidden;
+}
+.kisan-highlights::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--saffron),var(--brick),var(--sky),var(--green));
+}
+.kisan-highlights.hide{display:none;}
+.khl-item{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+  padding:28px 22px 24px;cursor:default;
+}
+.khl-item:not(:last-child)::after{
+  content:'';position:absolute;right:0;top:24px;bottom:24px;width:1px;
+  background:linear-gradient(180deg,transparent,rgba(43,29,14,0.09) 20%,rgba(43,29,14,0.09) 80%,transparent);
+}
+@media(max-width:760px){
+  .khl-item:not(:last-child)::after{display:none;}
+  .khl-item:not(:last-child){border-bottom:1px solid rgba(43,29,14,0.08);}
+}
+.khl-num{
+  position:absolute;top:16px;right:18px;font-family:'Baloo 2',sans-serif;
+  font-size:26px;font-weight:800;color:var(--khl-color,var(--accent));
+  opacity:.14;line-height:1;letter-spacing:.5px;pointer-events:none;
+}
+.khl-ic{
+  width:52px;height:52px;border-radius:16px;flex-shrink:0;font-size:24px;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 32% 28%, #fff, var(--khl-tint,var(--green-light)) 70%);
+  box-shadow:0 6px 14px -4px color-mix(in srgb, var(--khl-color,var(--accent)) 35%, transparent),
+             inset 0 0 0 1px rgba(255,255,255,.7);
+  pointer-events:none;
+}
+.khl-item h4{
+  font-family:'Baloo 2',sans-serif;font-size:15.5px;color:var(--ink);
+  font-weight:700;letter-spacing:.1px;
+}
+.khl-item p{font-size:12.5px;color:var(--ink-soft);line-height:1.55;max-width:220px;}
+
+/* ---------- SUB-SECTION SELECTOR GRID ---------- */
+.ksub-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;margin:26px 0 8px;
+}
+.ksub-card{
+  position:relative;background:#fff;border-radius:22px;padding:26px 20px 22px;
+  text-align:center;box-shadow:var(--shadow);cursor:pointer;overflow:hidden;
+  border-bottom:6px solid var(--ksub-color,var(--accent));
+  transition:transform .28s cubic-bezier(.25,.8,.35,1),box-shadow .28s ease;
+}
+.ksub-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 18px 36px rgba(43,29,14,0.18);}
+.ksub-card:active{transform:translateY(-3px) scale(.98);}
+.ksub-ic{
+  width:68px;height:68px;border-radius:50%;margin:6px auto 14px;
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  background:var(--ksub-tint,var(--cream2));
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ksub-card:hover .ksub-ic{transform:scale(1.1) rotate(-5deg);}
+.ksub-card h3{font-size:18.5px;color:var(--ink);margin-bottom:6px;}
+.ksub-card p{font-size:13px;color:var(--ink-soft);line-height:1.55;min-height:40px;}
+.ksub-go{
+  display:inline-block;margin-top:14px;padding:8px 18px;border-radius:30px;
+  background:var(--ksub-color,var(--accent));color:#fff;font-weight:700;font-size:13.5px;
+}
+.ksub-status{
+  position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;
+  letter-spacing:.4px;padding:4px 10px;border-radius:20px;text-transform:uppercase;
+}
+.ksub-status.live{background:var(--green-light);color:var(--green);}
+.ksub-status.soon{background:var(--cream2);color:var(--ink-soft);}
+
+/* ---------- SUB-SECTION PANELS ---------- */
+.ksub-panel{display:none;margin-top:8px;animation:fadein .45s ease;}
+.ksub-panel.active{display:block;}
+/* while a panel is open, hide the selector grid entirely */
+.ksub-grid.hide{display:none;}
+
+.ksub-back{
+  display:inline-flex;align-items:center;gap:8px;background:transparent;
+  color:var(--ink-soft);font-weight:700;font-size:14px;padding:8px 4px;margin-bottom:16px;
+  transition:color .2s ease,transform .2s ease;
+}
+.ksub-back:hover{color:var(--accent);transform:translateX(-3px);}
+.ksub-back span:first-child{font-size:17px;}
+
+/* ---------- "coming soon" placeholder ---------- */
+.ksub-soon-card{
+  background:#fff;border-radius:22px;padding:50px 24px;text-align:center;
+  box-shadow:var(--shadow);border:2px dashed var(--cream2);
+}
+.ksub-soon-ic{font-size:52px;display:block;margin-bottom:14px;opacity:.85;animation:bob 3.5s ease-in-out infinite;}
+.ksub-soon-card h3{font-size:20px;color:var(--ink);margin-bottom:8px;}
+.ksub-soon-card p{font-size:14px;color:var(--ink-soft);max-width:420px;margin:0 auto;line-height:1.6;}
+
+
+/* Crop Sathi (AI chat) styles now live in kisan/crop/crop.css —
+   loaded on demand by kisan.js only when that sub-section opens. */
+
+.crop-layout{display:block;}
+
+/* tiny inline loader shown for the instant it takes to fetch
+   crop.html/crop.css/crop.js the first time crop opens */
+.crop-loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;min-height:340px;color:var(--ink-soft);font-weight:700;font-size:14px;
+}
+.crop-loading-ic{font-size:38px;animation:bob 1.6s ease-in-out infinite;}
+/* pre-existing note: .ksub-soon-ic above also uses "bob" but this
+   keyframe wasn't defined anywhere in the project — added here since
+   this file is where it's used. */
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* ================================================================
+   WEATHER — same true full-screen app takeover as the crop chat
+   (see above): the moment this panel opens it fills the entire
+   viewport like a native app, header/footer/scrollbar gone. Inside,
+   weather.css handles the responsive part: single-column "phone
+   weather app" on narrow screens, sticky-hero two-column "desktop
+   weather app" split view on wide screens.
+   ================================================================ */
+html:has(#kisan .ksub-panel.active[data-ksub-panel="weather"]),
+body:has(#kisan .ksub-panel.active[data-ksub-panel="weather"]){
+  overflow:hidden;height:100%;
+}
+body:has(#kisan .ksub-panel.active[data-ksub-panel="weather"]) > header,
+body:has(#kisan .ksub-panel.active[data-ksub-panel="weather"]) > footer,
+body:has(#kisan .ksub-panel.active[data-ksub-panel="weather"]) > .scroll-progress{
+  display:none !important;
+}
+#kisan:has(.ksub-panel.active[data-ksub-panel="weather"]) .section-wrap{
+  padding:0;max-width:none;
+}
+.ksub-panel[data-ksub-panel="weather"].active{
+  display:block;margin:0;
+  position:fixed;inset:0;z-index:900;
+  height:100dvh;width:100%;background:var(--cream);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+
+/* "All tools" back button — same clean icon-circle + label pattern as the
+   AI chat's (Crop Sathi) back button: transparent row, plain white circle
+   with a real SVG chevron (not a text arrow), that turns into a coloured
+   gradient chip and nudges left on hover. */
+.ksub-panel[data-ksub-panel="weather"] > .ksub-back{
+  display:inline-flex;align-items:center;gap:9px;
+  margin:14px 0 2px 16px;padding:2px;background:transparent;color:var(--ink-soft);
+  font-weight:700;font-size:12px;letter-spacing:.3px;
+  transition:color .2s ease;
+}
+.ksub-panel[data-ksub-panel="weather"] > .ksub-back:hover{color:var(--ink);}
+.gw-back-ic{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;color:var(--ink);
+  box-shadow:0 3px 10px -3px rgba(43,29,14,0.22),inset 0 0 0 1px rgba(43,29,14,0.09);
+  transition:background .2s ease,color .2s ease,transform .22s cubic-bezier(.25,.8,.35,1),box-shadow .2s ease;
+}
+.gw-back-txt{text-transform:uppercase;}
+.ksub-panel[data-ksub-panel="weather"] > .ksub-back:hover .gw-back-ic{
+  background:linear-gradient(135deg,var(--sky),#1f7fd6);color:#fff;
+  transform:translateX(-3px);
+  box-shadow:0 5px 14px -3px rgba(31,127,214,0.55);
+}
+.ksub-panel[data-ksub-panel="weather"] > .ksub-back:active .gw-back-ic{transform:translateX(-1px) scale(.93);}

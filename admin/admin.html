@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+  ======================================================================
+  योजना Admin Panel — SECTION-ONLY FILE
+  ======================================================================
+  Simple, password-protected panel to add/edit/delete the scheme
+  articles shown on the योजना खोजें (yojna) section and read on
+  yojna/article.html. Talks to the API in server/server.js
+  (/api/schemes...). Needs the Gaon Sathi server running:
+    cd server && npm install && npm start
+  then open: http://localhost:8787/admin/admin.html
+
+  Password is set in server/.env → ADMIN_PASSWORD (default:
+  gaonsathi123 — change this before putting the site online).
+  This is intentionally simple: one shared password, no user accounts,
+  no database — just enough to keep random visitors from editing
+  scheme content.
+  ======================================================================
+-->
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>योजना Admin | Gaon Sathi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Mukta:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header>
+  <div class="navwrap">
+    <div class="logo">
+      <div class="mark">🌻</div>
+      <div>
+        <h1>गाँव साथी</h1>
+        <span class="eng">YOJNA ADMIN</span>
+      </div>
+    </div>
+    <button class="btn outline adm-logout" id="admLogoutBtn" hidden>लॉगआउट</button>
+  </div>
+</header>
+
+<main class="adm-wrap">
+
+  <!-- LOGIN SCREEN -->
+  <section class="adm-login" id="admLogin">
+    <div class="adm-login-card">
+      <h2>🔒 Admin लॉगिन</h2>
+      <p>योजना जोड़ने/बदलने के लिए पासवर्ड डालें</p>
+      <input type="password" id="admPassword" placeholder="पासवर्ड" autocomplete="current-password">
+      <button class="btn" id="admLoginBtn">लॉगिन करें</button>
+      <p class="adm-error" id="admLoginError" hidden></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="adm-dash" id="admDash" hidden>
+    <div class="adm-dash-head">
+      <h2>📋 सभी योजनाएं</h2>
+      <button class="btn" id="admNewBtn">+ नई योजना जोड़ें</button>
+    </div>
+    <p class="adm-hint">यहां जोड़ी/बदली गई योजनाएं तुरंत वेबसाइट के "योजना खोजें" सेक्शन में दिखने लगती हैं (अगर "प्रकाशित करें" चुना गया हो)।</p>
+    <div id="admList" class="adm-list"></div>
+  </section>
+
+  <!-- FORM -->
+  <section class="adm-form-wrap" id="admFormWrap" hidden>
+    <div class="adm-form-head">
+      <h2 id="admFormTitle">नई योजना जोड़ें</h2>
+      <button class="adm-close" id="admFormClose" aria-label="बंद करें">✕</button>
+    </div>
+
+    <form id="admForm" class="adm-form">
+      <input type="hidden" id="f_slug">
+
+      <div class="adm-grid2">
+        <label>शीर्षक (हिंदी) *<input type="text" id="f_title" required placeholder="जैसे: किसान क्रेडिट कार्ड (KCC)"></label>
+        <label>Title (English)<input type="text" id="f_titleEn" placeholder="e.g. Kisan Credit Card (KCC)"></label>
+      </div>
+
+      <div class="adm-grid3">
+        <label>श्रेणी *
+          <select id="f_tag" required>
+            <option value="farmer">🌾 किसान</option>
+            <option value="women">👩 महिला</option>
+            <option value="student">🎓 छात्र</option>
+            <option value="elder">👴 बुज़ुर्ग</option>
+            <option value="health">🏥 स्वास्थ्य</option>
+            <option value="housing">🏠 आवास</option>
+            <option value="employment">💼 रोज़गार</option>
+            <option value="welfare">🍚 राशन/कल्याण</option>
+            <option value="disability">♿ दिव्यांग</option>
+          </select>
+        </label>
+        <label>आइकॉन (emoji)<input type="text" id="f_icon" placeholder="🌾" maxlength="4"></label>
+        <label>आवेदन लिंक (Official URL)<input type="url" id="f_officialLink" placeholder="https://..."></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>विभाग (हिंदी)<input type="text" id="f_ministry" placeholder="जैसे: कृषि मंत्रालय"></label>
+        <label>Department (English)<input type="text" id="f_ministryEn" placeholder="e.g. Ministry of Agriculture"></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>एक-पंक्ति सार (हिंदी)<textarea id="f_oneLineSummary" rows="2" placeholder="यह योजना किसके लिए है, एक लाइन में"></textarea></label>
+        <label>One-line summary (English)<textarea id="f_oneLineSummaryEn" rows="2"></textarea></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>पूरा विवरण — यह योजना क्या है, कैसे काम करती है (हिंदी)<textarea id="f_description" rows="5" placeholder="2-4 वाक्यों में समझाएं कि यह योजना क्या है और कैसे काम करती है"></textarea></label>
+        <label>Full description — what it is & how it works (English)<textarea id="f_descriptionEn" rows="5"></textarea></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>लाभ / फायदा (हिंदी)<input type="text" id="f_benefit" placeholder="जैसे: ₹6,000 सालाना"></label>
+        <label>Benefit (English)<input type="text" id="f_benefitEn"></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>आवेदन तिथि (हिंदी)<input type="text" id="f_lastDate" placeholder="चालू — कभी भी आवेदन करें"></label>
+        <label>Apply-by (English)<input type="text" id="f_lastDateEn" placeholder="Ongoing — apply anytime"></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>पात्रता — एक लाइन में एक पॉइंट (हिंदी)<textarea id="f_eligibility" rows="4" placeholder="हर लाइन में एक पात्रता शर्त लिखें"></textarea></label>
+        <label>Eligibility — one point per line (English)<textarea id="f_eligibilityEn" rows="4"></textarea></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>ज़रूरी दस्तावेज़ — एक लाइन में एक (हिंदी)<textarea id="f_documentsRequired" rows="4" placeholder="जैसे: आधार कार्ड"></textarea></label>
+        <label>Documents required (English)<textarea id="f_documentsRequiredEn" rows="4"></textarea></label>
+      </div>
+
+      <div class="adm-grid2">
+        <label>आवेदन कैसे करें — एक लाइन में एक स्टेप (हिंदी)<textarea id="f_howToApply" rows="4" placeholder="जैसे: नज़दीकी बैंक शाखा में जाएं"></textarea></label>
+        <label>How to apply — one step per line (English)<textarea id="f_howToApplyEn" rows="4"></textarea></label>
+      </div>
+
+      <div class="adm-faqs">
+        <div class="adm-faqs-head">
+          <h3>❓ FAQs (वैकल्पिक)</h3>
+          <button type="button" class="btn outline adm-small-btn" id="admAddFaqBtn">+ सवाल जोड़ें</button>
+        </div>
+        <div id="admFaqList"></div>
+      </div>
+
+      <div class="adm-grid2 adm-toggles">
+        <label class="adm-checkbox"><input type="checkbox" id="f_isNew"> "नया" बैज दिखाएं</label>
+        <label class="adm-checkbox"><input type="checkbox" id="f_published" checked> वेबसाइट पर प्रकाशित करें</label>
+      </div>
+
+      <p class="adm-error" id="admFormError" hidden></p>
+
+      <div class="adm-form-actions">
+        <button type="button" class="btn outline" id="admCancelBtn">रद्द करें</button>
+        <button type="submit" class="btn" id="admSaveBtn">सेव करें</button>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+/*
+  ======================================================================
+  पशु साथी (Pashu Sathi) — SECTION-ONLY STYLESHEET
+  ======================================================================
+  Scoped entirely under #pashu so it never touches any other section's
+  styles. Mirrors the same "full-bleed hero outside .section-wrap, then
+  normal content inside .section-wrap" pattern used by kaam/kaam.css.
+  ====================================================================== */
+
+#pashu .ps-hero{
+  position:relative;height:340px;overflow:hidden;
+  background:#1E4620;
+}
+/* Hidden while the Pashu Bazar panel is open (toggled by pashu.js). */
+#pashu .ps-hero.ps-hero-hidden{display:none;}
+
+#pashu .ps-photo{
+  position:absolute;inset:-2%;background-size:cover;background-position:32% 82%;
+  background-image:url('https://images.pexels.com/photos/2602864/pexels-photo-2602864.jpeg?auto=compress&cs=tinysrgb&w=1920');
+  animation:ps-kenburns 22s cubic-bezier(.45,0,.55,1) infinite alternate;
+  filter:saturate(1.08) contrast(1.03);
+}
+@keyframes ps-kenburns{
+  0%{transform:scale(1) translate(0,0);}
+  100%{transform:scale(1.06) translate(-1%,-.6%);}
+}
+
+#pashu .ps-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(10,20,8,.35) 100%);
+}
+
+#pashu .ps-scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(14,24,12,.82) 0%,rgba(14,24,12,.4) 34%,rgba(14,24,12,0) 60%);
+}
+
+#pashu .ps-badge{
+  position:absolute;top:18px;right:18px;background:rgba(255,255,255,.94);color:#1E4620;
+  font-size:12px;font-weight:700;padding:7px 13px;border-radius:22px;
+  display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.18);
+  opacity:0;transform:translateY(-10px);
+  animation:ps-badge-in .6s cubic-bezier(.25,.8,.35,1) .5s forwards;
+}
+@keyframes ps-badge-in{to{opacity:1;transform:translateY(0);}}
+
+#pashu .ps-dot{width:7px;height:7px;border-radius:50%;background:#2E8B57;animation:ps-pulse-dot 1.8s ease-in-out infinite;}
+@keyframes ps-pulse-dot{
+  0%,100%{box-shadow:0 0 0 0 rgba(46,139,87,.55);}
+  50%{box-shadow:0 0 0 5px rgba(46,139,87,0);}
+}
+
+#pashu .ps-caption-wrap{position:absolute;left:0;right:0;bottom:22px;text-align:center;padding:0 22px;}
+
+#pashu .ps-caption h2{
+  font-size:26px;font-weight:800;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(16px);
+  animation:ps-cap-in .7s cubic-bezier(.25,.8,.35,1) .2s forwards;
+}
+#pashu .ps-caption p{
+  font-size:13px;margin-top:7px;color:#EFE1D3;text-shadow:0 1px 5px rgba(0,0,0,.45);
+  opacity:0;transform:translateY(14px);
+  animation:ps-cap-in .7s cubic-bezier(.25,.8,.35,1) .38s forwards;
+}
+@keyframes ps-cap-in{to{opacity:1;transform:translateY(0);}}
+
+#pashu .ps-underline{
+  width:46px;height:3px;background:#2E8B57;margin:10px auto 0;border-radius:3px;
+  transform:scaleX(0);transform-origin:center;
+  animation:ps-line-in .5s ease .62s forwards;
+}
+@keyframes ps-line-in{to{transform:scaleX(1);}}
+
+@media (max-width:640px){
+  #pashu .ps-hero{height:260px;}
+  #pashu .ps-caption h2{font-size:21px;}
+  #pashu .ps-badge{font-size:11px;padding:6px 11px;top:14px;right:14px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  #pashu .ps-photo{animation:none;}
+  #pashu .ps-badge,#pashu .ps-caption h2,#pashu .ps-caption p,#pashu .ps-underline{
+    animation:none;opacity:1;transform:none;
+  }
+}
+
+/* ======================================================================
+   SUB-SECTION SELECTOR — same visual language as Kisan Sathi's 4-card
+   grid (kisan/kisan.css .ksub-*), rebuilt here as .psub-* and scoped
+   under #pashu so this section stays fully self-contained inside
+   pashu/ (per the project's "one folder per section" rule — styles
+   are duplicated on purpose rather than reused cross-folder).
+   ====================================================================== */
+#pashu [hidden]{display:none !important;}
+#pashu{scroll-margin-top:73px;}
+
+#pashu .psub-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;margin:26px 0 8px;
+}
+#pashu .psub-card{
+  position:relative;background:#fff;border-radius:22px;padding:26px 20px 22px;
+  text-align:center;box-shadow:var(--shadow);cursor:pointer;overflow:hidden;
+  border-bottom:6px solid var(--psub-color,var(--accent));
+  transition:transform .28s cubic-bezier(.25,.8,.35,1),box-shadow .28s ease;
+}
+#pashu .psub-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:0 18px 36px rgba(43,29,14,0.18);}
+#pashu .psub-card:active{transform:translateY(-3px) scale(.98);}
+#pashu .psub-ic{
+  width:68px;height:68px;border-radius:50%;margin:6px auto 14px;
+  display:flex;align-items:center;justify-content:center;font-size:32px;
+  background:var(--psub-tint,var(--cream2));
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+#pashu .psub-card:hover .psub-ic{transform:scale(1.1) rotate(-5deg);}
+#pashu .psub-card h3{font-size:18.5px;color:var(--ink);margin-bottom:6px;}
+#pashu .psub-card p{font-size:13px;color:var(--ink-soft);line-height:1.55;min-height:40px;}
+#pashu .psub-go{
+  display:inline-block;margin-top:14px;padding:8px 18px;border-radius:30px;
+  background:var(--psub-color,var(--accent));color:#fff;font-weight:700;font-size:13.5px;
+}
+#pashu .psub-status{
+  position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;
+  letter-spacing:.4px;padding:4px 10px;border-radius:20px;text-transform:uppercase;
+}
+#pashu .psub-status.live{background:var(--green-light);color:var(--green);}
+#pashu .psub-status.soon{background:var(--cream2);color:var(--ink-soft);}
+
+/* ---------- SUB-SECTION PANELS ---------- */
+#pashu .psub-panel{display:none;margin-top:8px;animation:ps-fadein .45s ease;}
+#pashu .psub-panel.active{display:block;}
+#pashu .psub-grid.hide{display:none;}
+
+#pashu .psub-back{
+  display:inline-flex;align-items:center;gap:8px;background:transparent;
+  color:var(--ink-soft);font-weight:700;font-size:14px;padding:8px 4px;margin-bottom:16px;
+  transition:color .2s ease,transform .2s ease;
+}
+#pashu .psub-back:hover{color:var(--accent);transform:translateX(-3px);}
+#pashu .psub-back span:first-child{font-size:17px;}
+
+/* ---- Pashu Bazar: icon-only back button, pinned flush to the
+   panel's top-left corner instead of sitting inline with the content. ---- */
+#pashu .pbazar-panel{position:relative;padding-top:8px;}
+#pashu .psub-back-fab{
+  position:absolute;top:0;left:0;margin-bottom:0;
+  width:40px;height:40px;padding:0;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:#fff;box-shadow:var(--shadow);border:1px solid rgba(43,29,14,0.08);
+}
+#pashu .psub-back-fab:hover{color:var(--accent);transform:translateX(-2px);border-color:var(--accent);}
+#pashu .psub-back-fab svg{display:block;}
+
+@media (max-width:640px){
+  #pashu .pbazar-panel{padding-top:6px;}
+  #pashu .psub-back-fab{width:36px;height:36px;}
+  #pashu .psub-back-fab svg{width:18px;height:18px;}
+}
+
+/* ---- Pashu Bazar: animal-type filter, centred and slightly more
+   refined than the site's default chip look. ---- */
+#pashu .pbazar-filter{
+  justify-content:center;gap:8px;margin:0 0 26px;
+}
+#pashu .pbazar-filter .chip{
+  padding:8px 18px;border-radius:24px;background:#fff;
+  border:1px solid rgba(43,29,14,0.1);box-shadow:0 1px 3px rgba(43,29,14,0.05);
+  font-size:13.5px;font-weight:600;letter-spacing:.1px;
+}
+#pashu .pbazar-filter .chip:hover{border-color:var(--accent);box-shadow:0 2px 6px rgba(43,29,14,0.08);}
+#pashu .pbazar-filter .chip.active{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+  box-shadow:0 3px 10px rgba(43,29,14,0.16);
+}
+@media (max-width:640px){
+  #pashu .pbazar-filter{gap:6px;padding:0 42px;}
+  #pashu .pbazar-filter .chip{padding:7px 14px;font-size:13px;}
+}
+
+@keyframes ps-fadein{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+@media (max-width:640px){
+  #pashu .psub-card{padding:22px 16px 18px;}
+}
+
+/* ======================================================================
+   PASHU BAZAR — listing cards etc. Scoped under #pashu, using only
+   this project's own colour variables.
+   ====================================================================== */
+
+/* ---- listing cards — FLIPKART-STYLE PRODUCT GRID ----
+   Rebuilt to match काम खोजो's job/worker cards (kaam/kaam.css's
+   .product-grid / .product-card / .pc-* — a square photo tile up top,
+   then a compact info body, same "grid of product cards" feel as
+   Flipkart) instead of the old wide horizontal row. Class names below
+   (bazar-*) are kept as-is on purpose — only the layout rules change —
+   so the existing HTML markup (4 demo cards + pashu.js's buildBazarCard)
+   didn't need to be rewritten, just the "chat" 3rd action was dropped
+   in favour of two clear labelled buttons (WhatsApp / Call), same as
+   kaam's single labelled "📞 कॉल करें" button. ---- */
+#pashu .bazar-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;
+}
+#pashu .bazar-card{
+  background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;position:relative;
+  transition:transform .22s ease,box-shadow .22s ease;animation:pbazar-card-pop .4s ease both;
+}
+@keyframes pbazar-card-pop{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+#pashu .bazar-card:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(43,29,14,.2);}
+
+#pashu .bazar-photo{
+  position:relative;aspect-ratio:1/1;width:100%;font-size:48px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--bz-color,var(--accent)),color-mix(in srgb, var(--bz-color,var(--accent)) 55%, #000));
+}
+#pashu .bazar-photo.has-photo{font-size:0;}
+#pashu .bazar-photo img{width:100%;height:100%;object-fit:cover;}
+#pashu .bazar-dist{
+  position:absolute;top:9px;left:9px;bottom:auto;right:auto;width:auto;text-align:left;
+  background:#fff;color:var(--bz-color,var(--accent));font-size:10px;font-weight:800;
+  padding:3px 9px;border-radius:20px;box-shadow:0 2px 6px rgba(0,0,0,.18);
+}
+#pashu .bazar-photo-count{
+  position:absolute;top:9px;right:9px;background:rgba(20,14,8,.72);color:#fff;
+  font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;
+}
+
+#pashu .bazar-body{padding:12px 13px 4px;flex:1;display:flex;flex-direction:column;}
+#pashu .bazar-body .tag{align-self:flex-start;margin-bottom:7px;}
+#pashu .bazar-body h4{font-size:14px;line-height:1.3;color:var(--ink);margin:0;min-height:37px;}
+#pashu .bazar-stats{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0;}
+#pashu .bazar-stats span{
+  font-size:10.5px;font-weight:700;color:var(--ink-soft);background:var(--cream);
+  padding:3px 8px;border-radius:20px;
+}
+#pashu .bazar-status{background:var(--green-light) !important;color:var(--green) !important;}
+#pashu .bazar-status.preg{background:var(--pink-light) !important;color:var(--pink) !important;}
+
+#pashu .bazar-seller{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);font-weight:600;margin-top:9px;}
+#pashu .bazar-avatar{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;font-size:9.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  background:linear-gradient(135deg,var(--bz-color,var(--accent)),color-mix(in srgb, var(--bz-color,var(--accent)) 60%, #000));
+}
+
+#pashu .bazar-side{padding:10px 13px 13px;margin-top:auto;text-align:left;}
+#pashu .bazar-side .price{font-size:17px;font-weight:800;color:var(--bz-color,var(--accent));}
+#pashu .bazar-loc{font-size:11px;color:var(--ink-soft);margin:2px 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#pashu .bazar-actions{display:flex;gap:7px;}
+#pashu .bazar-act{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:5px;
+  padding:9px 6px;border-radius:10px;font-size:12px;font-weight:700;white-space:nowrap;
+  background:var(--cream2);color:var(--ink);transition:transform .2s ease,background .2s ease;
+}
+#pashu .bazar-act:hover{transform:translateY(-2px);}
+#pashu .bazar-act.call{background:var(--bz-color,var(--accent));color:#fff;}
+#pashu .bazar-act.call:hover{background:color-mix(in srgb, var(--bz-color,var(--accent)) 82%, #000);}
+#pashu .bazar-act.wa:hover{background:#d9f7e3;}
+#pashu .bazar-act.chat{display:none;}
+
+@media (max-width:640px){
+  #pashu .bazar-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  #pashu .bazar-photo{font-size:34px;}
+  #pashu .bazar-body h4{font-size:12.5px;min-height:32px;}
+  #pashu .bazar-act{font-size:11px;padding:8px 4px;}
+}
+
+/* ---- sell listing: fixed pill FAB (icon + label) on the side of
+   the Bazar panel, opens the pbazar-modal popup below. ---- */
+#pashu .pbazar-sell-fab{
+  position:fixed;right:20px;bottom:24px;z-index:40;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:14px 20px 14px 16px;border-radius:30px;border:none;cursor:pointer;
+  background:var(--saffron);color:#fff;font-size:14px;font-weight:800;font-family:inherit;
+  box-shadow:0 8px 22px rgba(224,122,29,.4);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+#pashu .pbazar-sell-fab:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 26px rgba(224,122,29,.48);}
+#pashu .pbazar-sell-fab:active{transform:translateY(0) scale(.97);}
+#pashu .pbazar-sell-fab svg{display:block;flex-shrink:0;}
+
+@media (max-width:640px){
+  #pashu .pbazar-sell-fab{right:16px;bottom:20px;padding:12px 16px 12px 13px;font-size:13px;}
+}
+
+/* ---- sell listing: popup/modal that holds the form ---- */
+#pashu .pbazar-modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;}
+#pashu .pbazar-modal[hidden]{display:none;}
+#pashu .pbazar-modal-backdrop{position:absolute;inset:0;background:rgba(20,14,8,.55);animation:pbazar-modal-fade .18s ease;}
+#pashu .pbazar-modal-panel{
+  position:relative;background:#fff;border-radius:20px;padding:26px 22px 24px;
+  width:100%;max-width:520px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(20,14,8,.35);
+  animation:pbazar-modal-in .22s cubic-bezier(.25,.8,.35,1);
+}
+#pashu .pbazar-modal-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:none;
+  background:var(--cream2);color:var(--ink-soft);font-size:20px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:background .18s ease,color .18s ease;
+}
+#pashu .pbazar-modal-close:hover{background:var(--pink-light);color:var(--pink);}
+@keyframes pbazar-modal-fade{from{opacity:0;}to{opacity:1;}}
+@keyframes pbazar-modal-in{from{opacity:0;transform:translateY(16px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+@media (max-width:640px){
+  #pashu .pbazar-modal{padding:0;align-items:flex-end;}
+  #pashu .pbazar-modal-panel{max-width:none;max-height:92vh;border-radius:20px 20px 0 0;}
+}
+
+/* ---- sell-form field grid ---- */
+#pashu .pbazar-formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+#pashu .pbazar-formgrid label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;}
+#pashu .pbazar-formgrid input{
+  width:100%;padding:11px 14px;border-radius:12px;border:2px solid var(--cream2);
+  font-size:14px;font-family:inherit;background:#fff;
+}
+#pashu .pbazar-formgrid input:focus{outline:none;border-color:var(--accent);}
+#pashu .pbazar-modal-panel label[for="bazarSellInfo"]{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+@media (max-width:640px){#pashu .pbazar-formgrid{grid-template-columns:1fr;}}
+
+/* ---- sell-form section labels ("Category" / "Status" / "Photos") ---- */
+#pashu .pbazar-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;}
+
+/* ---- sell-form photo upload: dashed "add" tile + removable thumbnails ---- */
+#pashu .pbazar-photo-upload{display:flex;flex-wrap:wrap;gap:10px;}
+#pashu .pbazar-photo-add{
+  width:88px;height:88px;border-radius:14px;border:2px dashed var(--cream2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  color:var(--ink-soft);font-size:11px;font-weight:700;text-align:center;cursor:pointer;
+  transition:border-color .2s ease,color .2s ease,background .2s ease;
+}
+#pashu .pbazar-photo-add:hover{border-color:var(--saffron);color:var(--saffron-dark);background:var(--cream);}
+#pashu .pbazar-photo-add-ic{font-size:22px;}
+#pashu .pbazar-photo-thumb{position:relative;width:88px;height:88px;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);}
+#pashu .pbazar-photo-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+#pashu .pbazar-photo-rm{
+  position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;
+  background:rgba(20,14,8,.72);color:#fff;font-size:11px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ---- sell-form "use my current location" button (same pattern as
+   काम खोजो's post form, recoloured to this section's saffron/soil) ---- */
+#pashu .loc-current-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  padding:13px 16px;border-radius:12px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--saffron),var(--soil));color:#fff;
+  font-size:14.5px;font-weight:800;font-family:inherit;
+  box-shadow:0 4px 12px rgba(224,122,29,.28);transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease;
+}
+#pashu .loc-current-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(224,122,29,.38);}
+#pashu .loc-current-btn:active:not(:disabled){transform:translateY(0) scale(.98);}
+#pashu .loc-current-btn:disabled{opacity:.75;cursor:wait;}
+#pashu .loc-current-ic{font-size:17px;}
+#pashu .loc-loading .loc-current-ic{animation:pbazar-loc-spin 1s linear infinite;display:inline-block;}
+@keyframes pbazar-loc-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+#pashu .loc-status{font-size:12.5px;font-weight:700;margin:9px 2px 0;padding:8px 12px;border-radius:10px;line-height:1.4;}
+#pashu .loc-status-loading{background:var(--cream2);color:var(--saffron-dark);}
+#pashu .loc-status-success{background:#e3f4e6;color:#1f7a37;}
+#pashu .loc-status-error{background:#fce9e6;color:#b3402f;}
+
+/* ---- buyer safety tips ---- */
+#pashu .pbazar-tips{
+  background:linear-gradient(180deg,#fff,var(--cream) 130%);border-radius:22px;
+  padding:24px 22px;box-shadow:var(--shadow);border:1px solid rgba(43,29,14,0.06);
+}
+#pashu .pbazar-tips h3{margin-bottom:14px;font-size:17px;}
+#pashu .pbazar-tips-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+#pashu .pbazar-tips-grid > div{display:flex;gap:12px;align-items:flex-start;}
+#pashu .pbazar-tips-grid span{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--soil);color:#fff;
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+#pashu .pbazar-tips-grid p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;}

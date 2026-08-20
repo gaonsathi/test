@@ -1,0 +1,152 @@
+<!-- ============================================================
+     KISAN SATHI → WEATHER — Google-Weather-look forecast UI, powered
+     entirely by Open-Meteo data (no Google API, no key, no billing).
+     This whole fragment is fetched + injected by weather.js into
+     the existing #kisan weather panel. It does not exist anywhere
+     else in the page markup, so nothing outside kisan/weather/
+     needs to change.
+     ============================================================ -->
+<div class="gw" id="gw">
+
+  <!-- ---------- Search bar ---------- -->
+  <div class="gw-search-wrap">
+    <div class="gw-search">
+      <span class="gw-search-ic">🔍</span>
+      <input type="text" id="gwSearchInput" class="gw-search-input" autocomplete="off"
+             placeholder="गाँव, शहर या ज़िला खोजें (भारत)" data-en-placeholder="Search village, city or district (India)">
+      <button type="button" id="gwClearBtn" class="gw-search-clear" hidden aria-label="साफ़ करें">✕</button>
+    </div>
+    <button type="button" id="gwLocateBtn" class="gw-locate-btn">
+      <span class="gw-locate-ic">📍</span>
+      <span data-en="My location">मेरी लोकेशन</span>
+    </button>
+    <div class="gw-suggest" id="gwSuggest" hidden></div>
+  </div>
+  <p class="gw-search-note" data-en="Showing places in India only">सिर्फ़ भारत की जगहें दिखाई जा रही हैं</p>
+
+  <!-- ---------- Loading skeleton ---------- -->
+  <div class="gw-skeleton" id="gwSkeleton">
+    <div class="gw-skel-hero shimmer"></div>
+    <div class="gw-skel-row shimmer"></div>
+    <div class="gw-skel-row shimmer"></div>
+  </div>
+
+  <!-- ---------- Error state ---------- -->
+  <div class="gw-error" id="gwError" hidden>
+    <span class="gw-error-ic">⚠️</span>
+    <p id="gwErrorText" data-en="Could not load weather. Please try again.">मौसम लोड नहीं हो सका। कृपया दोबारा कोशिश करें।</p>
+    <button type="button" id="gwRetryBtn" class="gw-retry-btn" data-en="Try again">दोबारा कोशिश करें</button>
+  </div>
+
+  <!-- ---------- Main content (filled in by JS) ---------- -->
+  <div class="gw-content" id="gwContent" hidden>
+
+    <!-- LEFT column on desktop: hero stays pinned while the right side scrolls,
+         exactly like the Google Weather app's desktop/tablet split view -->
+    <div class="gw-left">
+      <!-- Hero current-conditions card (Pixel/Google Weather app style) -->
+      <div class="gw-hero" id="gwHero" data-cond="clear-day">
+        <div class="gw-hero-top">
+          <div class="gw-hero-place">
+            <span class="gw-hero-pin">📍</span>
+            <span id="gwPlaceName">—</span>
+          </div>
+          <div class="gw-hero-top-right">
+            <span id="gwHeroUpdated">—</span>
+            <button type="button" id="gwRefreshBtn" class="gw-refresh-btn" aria-label="ताज़ा करें" title="ताज़ा करें">🔄</button>
+          </div>
+        </div>
+
+        <div class="gw-hero-main">
+          <div class="gw-hero-icon" id="gwHeroIcon"></div>
+          <div class="gw-hero-temp-wrap">
+            <div class="gw-hero-temp"><span id="gwHeroTemp">--</span><span class="gw-deg">°</span></div>
+            <div class="gw-hero-cond" id="gwHeroCond">—</div>
+            <div class="gw-hero-sub">
+              <span id="gwHeroFeels">—</span>
+              <span class="gw-dot">•</span>
+              <span id="gwHeroHighLow">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Precipitation / Humidity / Wind — the row Google's weather card is known for -->
+        <div class="gw-hero-stats" id="gwHeroStats">
+          <div class="gw-stat">
+            <span class="gw-stat-ic">💧</span>
+            <span class="gw-stat-val" id="gwStatPrecip">--%</span>
+            <span class="gw-stat-lbl" data-en="Precipitation">वर्षा संभावना</span>
+          </div>
+          <div class="gw-stat">
+            <span class="gw-stat-ic">💦</span>
+            <span class="gw-stat-val" id="gwStatHumidity">--%</span>
+            <span class="gw-stat-lbl" data-en="Humidity">नमी</span>
+          </div>
+          <div class="gw-stat">
+            <span class="gw-stat-ic">💨</span>
+            <span class="gw-stat-val" id="gwStatWind">-- km/h</span>
+            <span class="gw-stat-lbl" data-en="Wind">हवा</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT column on desktop: hourly / 10-day / details, independently scrollable -->
+    <div class="gw-right">
+      <!-- Hourly scroll strip — title shows which day is currently selected below -->
+      <div class="gw-block">
+        <h4 class="gw-block-title"><span data-en="Hourly forecast">घंटेवार पूर्वानुमान</span><span id="gwHourlyDayTag" class="gw-block-title-tag"></span></h4>
+        <div class="gw-hourly" id="gwHourly"></div>
+      </div>
+
+      <div class="gw-block">
+        <h4 class="gw-block-title" data-en="Precipitation & wind">वर्षा और हवा</h4>
+
+        <!-- Hourly precipitation strip — Google-Weather-
+             style: each hour gets a little "pot" that fills with water to
+             the level of that hour's expected rainfall, labelled in mm. -->
+        <div class="gw-precip-block">
+          <div class="gw-precip-head">
+            <span class="gw-precip-head-ic">💧</span>
+            <span data-en="Hourly precipitation (mm)">घंटेवार वर्षा (mm)</span>
+            <span id="gwPrecipDayTag" class="gw-block-title-tag"></span>
+          </div>
+          <div class="gw-precip-hourly" id="gwPrecipHourly"></div>
+        </div>
+
+        <!-- Hourly wind strip — Google-Weather-
+             style: each hour gets a small compass needle pointing the wind's
+             direction, with a strength-coloured ring and the speed in km/h.
+             The ring is marked with N (north) so the needle reads correctly;
+             tap "दिशा मिलाएँ" to align it live with the phone's own compass. -->
+        <div class="gw-wind-block">
+          <div class="gw-wind-head">
+            <span class="gw-wind-head-ic">💨</span>
+            <span data-en="Hourly wind">घंटेवार हवा</span>
+            <span id="gwWindDayTag" class="gw-block-title-tag"></span>
+            <button type="button" class="gw-compass-cal-btn" id="gwCompassCalBtn" data-en="🧭 Align to north">🧭 दिशा मिलाएँ</button>
+          </div>
+          <div class="gw-wind-hourly" id="gwWindHourly"></div>
+          <p class="gw-compass-note" id="gwCompassNote" data-en="N marks true/magnetic north on each needle. Tap “Align to north” to rotate them live using your phone's compass.">हर सुई पर N असली/चुंबकीय उत्तर दिखाता है। फ़ोन के कंपास से सुइयों को सही दिशा में घुमाने के लिए "दिशा मिलाएँ" दबाएँ।</p>
+        </div>
+      </div>
+
+      <!-- 10-day forecast — Google-style horizontal carousel; tap a day to update the hourly strip above -->
+      <div class="gw-block">
+        <h4 class="gw-block-title" data-en="10-day forecast">10 दिन का पूर्वानुमान</h4>
+        <div class="gw-daily" id="gwDaily"></div>
+      </div>
+
+      <!-- Details grid -->
+      <div class="gw-block">
+        <h4 class="gw-block-title" data-en="Details">विवरण</h4>
+        <div class="gw-details" id="gwDetails"></div>
+      </div>
+
+      <p class="gw-credit" data-en="Weather data by Open-Meteo">मौसम डेटा: Open-Meteo</p>
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,43 @@
+{
+  "source": "Cabinet Committee on Economic Affairs (CCEA) / Press Information Bureau, Ministry of Agriculture & Farmers Welfare, Govt of India",
+  "sourceUrlKharif": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2260617",
+  "sourceUrlRabi": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2173567",
+  "unit": "₹ / क्विंटल (Rs per quintal)",
+  "kharif": {
+    "season": "2026-27",
+    "approvedOn": "13 May 2026",
+    "crops": [
+      { "name_hi": "धान (सामान्य)", "name_en": "Paddy (Common)", "msp": 2441, "prevMsp": 2369 },
+      { "name_hi": "धान (ग्रेड A)", "name_en": "Paddy (Grade A)", "msp": 2461, "prevMsp": 2389 },
+      { "name_hi": "ज्वार (हाइब्रिड)", "name_en": "Jowar (Hybrid)", "msp": 4023, "prevMsp": 3699 },
+      { "name_hi": "ज्वार (मालदांडी)", "name_en": "Jowar (Maldandi)", "msp": 4073, "prevMsp": 3749 },
+      { "name_hi": "बाजरा", "name_en": "Bajra", "msp": 2900, "prevMsp": 2775 },
+      { "name_hi": "रागी", "name_en": "Ragi", "msp": 5205, "prevMsp": 4886 },
+      { "name_hi": "मक्का", "name_en": "Maize", "msp": 2410, "prevMsp": 2400 },
+      { "name_hi": "तूर/अरहर", "name_en": "Tur / Arhar", "msp": 8450, "prevMsp": 8000 },
+      { "name_hi": "मूंग", "name_en": "Moong", "msp": 8780, "prevMsp": 8768 },
+      { "name_hi": "उड़द", "name_en": "Urad", "msp": 8200, "prevMsp": 7800 },
+      { "name_hi": "मूंगफली", "name_en": "Groundnut", "msp": 7517, "prevMsp": 7263 },
+      { "name_hi": "सूरजमुखी बीज", "name_en": "Sunflower Seed", "msp": 8343, "prevMsp": 7721 },
+      { "name_hi": "सोयाबीन (पीला)", "name_en": "Soybean (Yellow)", "msp": 5708, "prevMsp": 5328 },
+      { "name_hi": "तिल", "name_en": "Sesamum", "msp": 10346, "prevMsp": 9846 },
+      { "name_hi": "रामतिल (नाइजरसीड)", "name_en": "Nigerseed", "msp": 10052, "prevMsp": 9537 },
+      { "name_hi": "कपास (मध्यम रेशा)", "name_en": "Cotton (Medium Staple)", "msp": 8267, "prevMsp": 7710 },
+      { "name_hi": "कपास (लंबा रेशा)", "name_en": "Cotton (Long Staple)", "msp": 8667, "prevMsp": 8110 }
+    ]
+  },
+  "rabi": {
+    "season": "2026-27",
+    "approvedOn": "1 October 2025",
+    "crops": [
+      { "name_hi": "गेहूं", "name_en": "Wheat", "msp": 2585, "prevMsp": 2425 },
+      { "name_hi": "जौ", "name_en": "Barley", "msp": 2150, "prevMsp": 1980 },
+      { "name_hi": "चना", "name_en": "Gram (Chana)", "msp": 5875, "prevMsp": 5650 },
+      { "name_hi": "मसूर", "name_en": "Lentil (Masur)", "msp": 7000, "prevMsp": 6700 },
+      { "name_hi": "सरसों/रेपसीड", "name_en": "Rapeseed & Mustard", "msp": 6200, "prevMsp": 5950 },
+      { "name_hi": "कुसुम", "name_en": "Safflower", "msp": 6540, "prevMsp": 5940 }
+    ]
+  },
+  "note_hi": "यह सरकार द्वारा तय न्यूनतम समर्थन मूल्य (MSP) है — मंडी में इससे कम या ज़्यादा भाव मिल सकता है। असली, आज का मंडी भाव ऊपर वाले टैब में देखें।",
+  "note_en": "This is the government-fixed Minimum Support Price — actual mandi prices can be above or below this. Check today's real mandi price in the tab above."
+}

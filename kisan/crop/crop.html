@@ -1,0 +1,187 @@
+<!-- ===================================================================
+     CROP SATHI — AI crop chat tool markup, split out of kisan.html.
+     This fragment is FETCHED AND INJECTED by kisan/kisan.js the first
+     time a visitor opens the "crop" sub-section — it is NOT part of
+     the initial page load. Keep it that way: everything a visitor
+     needs just to browse Kisan Sathi's other tabs (weather / jamin /
+     rate) must not have to wait on this file.
+     =================================================================== -->
+
+<!-- ---- Sidebar (desktop only — hidden on phones) ---- -->
+<aside class="crop-sidebar" id="cropSidebar">
+  <button type="button" class="cs-back" data-ksub-back>
+    <span class="cs-back-ic">←</span>
+    <span class="cs-back-txt" data-en="All tools">सभी टूल्स</span>
+  </button>
+
+  <div class="cs-brand">
+    <span class="cs-brand-ic">🌾</span>
+    <div class="cs-brand-text">
+      <h3 data-en="Crop Sathi">फसल साथी</h3>
+      <p data-en="In your language, your AI farm assistant">आपकी भाषा में, आपका AI कृषि सहायक</p>
+    </div>
+  </div>
+
+  <div class="cs-steps">
+    <div class="cs-step">
+      <span class="cs-step-ic">📎</span>
+      <div><h5 data-en="Send Photo">फोटो भेजें</h5><p data-en="Snap your crop or leaf">फसल या पत्ती की फोटो खींचें</p></div>
+    </div>
+    <div class="cs-step">
+      <span class="cs-step-ic">🤖</span>
+      <div><h5 data-en="AI Checks It">AI जांच करे</h5><p data-en="Crop, health &amp; disease in seconds">फसल, सेहत और बीमारी सेकंडों में</p></div>
+    </div>
+    <div class="cs-step">
+      <span class="cs-step-ic">💬</span>
+      <div><h5 data-en="Ask Anything">कुछ भी पूछें</h5><p data-en="Follow-up questions, by voice or typing">आगे के सवाल, आवाज़ या लिखकर</p></div>
+    </div>
+  </div>
+
+  <div class="cs-actions">
+    <button type="button" class="cs-action-btn" id="sideCameraBtn">
+      <span class="cs-action-ic">📷</span> <span data-en="Open Camera">कैमरा खोलें</span>
+    </button>
+    <button type="button" class="cs-action-btn cs-action-outline" id="sideGalleryBtn">
+      <span class="cs-action-ic">🖼️</span> <span data-en="Choose Photo">फोटो चुनें</span>
+    </button>
+  </div>
+
+  <div class="cs-suggest">
+    <h6 data-en="Try asking">पूछ कर देखें</h6>
+    <div class="cs-suggest-list" id="sideSuggestList"></div>
+  </div>
+
+  <p class="cs-disclaimer" data-en="AI advice is a helpful guide, not a replacement for your local agriculture officer.">AI की सलाह एक मददगार सुझाव है, अपने कृषि अधिकारी की सलाह की जगह नहीं।</p>
+</aside>
+
+<div class="wa-shell" id="waShell">
+
+  <!-- ---- Chat header (green bar, like WhatsApp) ---- -->
+  <div class="wa-header">
+    <div class="wa-header-left">
+      <button type="button" class="wa-back-btn" data-ksub-back aria-label="वापस" title="सभी टूल्स" data-en-title="All tools">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="wa-avatar">🌾</span>
+      <div class="wa-header-text">
+        <h4 data-en="Crop Sathi">फसल साथी</h4>
+        <p class="wa-status" id="chatHeadStatus" data-en="Online">ऑनलाइन</p>
+      </div>
+    </div>
+    <button type="button" class="wa-reset-btn" id="waResetBtn" title="नई बातचीत" data-en-title="New chat">
+      <span class="wa-reset-ic"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+      <span class="wa-reset-txt" data-en="New chat">नई चैट</span>
+    </button>
+  </div>
+
+  <!-- ---- Chat body / message thread ---- -->
+  <div class="wa-body" id="chatThread">
+
+    <div class="wa-daypill"><span data-en="Today">आज</span></div>
+
+    <div class="chat-row chat-row-ai">
+      <span class="chat-avatar">🌾</span>
+      <div class="chat-bubble chat-bubble-ai">
+        <p data-en="Hi! I'm Crop Sathi 🌾 Tap + below and send a photo of your crop — I'll check it and tell you everything.">नमस्ते! मैं फसल साथी हूं 🌾 नीचे ➕ दबाकर अपनी फसल की फोटो भेजें — मैं जांच करके आपको सब कुछ बताऊंगा।</p>
+        <span class="chat-time" data-time></span>
+      </div>
+    </div>
+
+    <div class="wa-daypill wa-weather-pill" id="weatherChip">
+      <span class="wc-ic">📍</span>
+      <span class="wc-text" data-en="Adding your local weather...">आपके इलाके का मौसम जोड़ा जा रहा है...</span>
+    </div>
+
+    <!-- photo / analysis / follow-up messages are appended below by JS -->
+  </div>
+
+  <!-- ---- Composer (attach + text/voice + send, sticky like WhatsApp) ---- -->
+  <div class="wa-composer-wrap">
+
+    <div class="wa-quick" id="composerQuick" hidden></div>
+
+    <div class="wa-composer">
+      <input type="file" id="cropImageInputCamera" accept="image/*" capture="environment" hidden>
+      <input type="file" id="cropImageInputGallery" accept="image/*" hidden>
+
+      <div class="wa-attach-wrap">
+        <button type="button" class="wa-plus-btn" id="waPlusBtn" aria-label="जोड़ें" aria-haspopup="true" aria-expanded="false">+</button>
+        <div class="wa-attach-menu" id="waAttachMenu" hidden>
+          <button type="button" id="takePicBtn">
+            <span class="wa-attach-ic">📸</span>
+            <span data-en="Take Photo">फोटो लें</span>
+          </button>
+          <button type="button" id="galleryBtn">
+            <span class="wa-attach-ic">🖼️</span>
+            <span data-en="Choose from Gallery">गैलरी से चुनें</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="wa-mic-btn" id="waMicBtn" aria-label="बोलें"
+        title="लाइव आवाज़ बातचीत खोलें" data-en-title="Open live voice chat">
+        <span class="wa-mic-ring" id="waMicRing"></span>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+
+      <form class="wa-input-row" id="composerTextRow">
+        <input type="text" class="wa-input" id="composerInput" autocomplete="off"
+          placeholder="मैसेज लिखें..." data-en-placeholder="Type a message...">
+        <button type="submit" class="wa-send-btn" id="composerSendBtn" aria-label="भेजें">
+          <span id="waSendIcon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></span>
+        </button>
+      </form>
+    </div>
+
+
+    <p class="ai-disclaimer eng" data-en="AI advice is a helpful guide, not a replacement for your local agriculture officer.">AI की सलाह एक मददगार सुझाव है, अपने कृषि अधिकारी की सलाह की जगह नहीं।</p>
+  </div>
+
+  <!-- inline error pill -->
+  <div class="wa-error-pill" id="scanError" hidden></div>
+  <p class="voice-unsupported" id="voiceUnsupported" hidden data-en="Voice is not supported in this browser. Please open this site in Chrome.">यह सुविधा इस ब्राउज़र में काम नहीं करती। कृपया Chrome ब्राउज़र में खोलें।</p>
+</div>
+
+<!-- ===================================================================
+     LIVE VOICE MODE — NOT full-screen: a dimmed backdrop scoped to the
+     chat window (.wa-shell, which is position:relative), with a small
+     rounded card that animates in at the center. Continuous listen →
+     Gemini reply → speak-aloud loop, with a language picker
+     (Auto / English / Hindi / Bhojpuri / Bangla).
+     Hidden by default; toggled by crop.js (openLiveVoice/closeLiveVoice).
+     =================================================================== -->
+<div class="live-voice" id="liveVoice" hidden>
+  <div class="lv-card" id="lvCard">
+    <span class="lv-puff lv-puff-1" aria-hidden="true"></span>
+    <span class="lv-puff lv-puff-2" aria-hidden="true"></span>
+    <span class="lv-puff lv-puff-3" aria-hidden="true"></span>
+    <div class="lv-evap" id="lvEvap" aria-hidden="true"></div>
+    <div class="lv-top">
+      <button type="button" class="lv-close" id="lvCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="lv-stage">
+      <div class="lv-orb lv-idle" id="lvOrb">
+        <span class="lv-ring lv-ring-1"></span>
+        <span class="lv-ring lv-ring-2"></span>
+        <span class="lv-ring lv-ring-3"></span>
+        <span class="lv-orb-core"></span>
+        <span class="lv-orb-logo" aria-hidden="true">🌾</span>
+      </div>
+      <p class="lv-status" id="lvStatus" data-en="Hi! I'm listening, go ahead">नमस्ते! मैं सुन रही हूँ, बोलिए</p>
+      <p class="lv-caption" id="lvCaption"></p>
+    </div>
+
+    <div class="lv-controls">
+      <button type="button" class="lv-ctrl-btn lv-mute-btn" id="lvMuteBtn" aria-label="Mute AI voice" title="AI की आवाज़ बंद/चालू करें">
+        <span>🔊</span>
+      </button>
+      <button type="button" class="lv-mic-btn" id="lvMicBtn" aria-label="Mic">
+        <span id="lvMicIcon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span>
+      </button>
+      <button type="button" class="lv-ctrl-btn lv-end-btn" id="lvEndBtn" aria-label="End call" title="बातचीत समाप्त करें">
+        <span>✕</span>
+      </button>
+    </div>
+  </div>
+</div>
