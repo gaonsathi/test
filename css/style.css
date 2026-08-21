@@ -633,7 +633,7 @@
   footer{background:var(--ink);color:#f4ead8;padding:34px 20px;text-align:center;margin-top:20px;}
   footer h3{font-family:'Baloo 2';color:var(--saffron);font-size:20px;}
   footer p{font-size:13px;opacity:.8;margin-top:8px;}
-  footer .credit{font-size:12px;opacity:.65;margin-top:14px;padding-top:14px;border-top:1px solid rgba(244,234,216,.15);}
+  footer .credit{font-family:'Baloo 2';font-size:16px;font-weight:500;opacity:.9;margin-top:14px;letter-spacing:.3px;}
 
   textarea{
     width:100%;padding:14px;border-radius:14px;border:2px solid var(--cream2);font-family:inherit;
