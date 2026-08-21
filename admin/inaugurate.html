@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!--
+  ======================================================================
+  उद्घाटन Admin — SECTION-ONLY FILE
+  ======================================================================
+  Generates the secret "ribbon-cutting" link + QR code that opens the
+  homepage curtain (see intro/intro.js + server/server.js). Whoever
+  scans this QR code on their phone triggers the grand-opening
+  animation AND permanently unlocks the curtain for every future
+  visitor — it's a one-time inauguration, not a repeatable login.
+
+  Needs the Gaon Sathi server running:
+    cd server && npm install && npm start
+  then open: http://localhost:8787/admin/inaugurate.html
+
+  Uses the SAME password as the योजना admin panel (server/.env →
+  ADMIN_PASSWORD). The actual secret baked into the QR code is a
+  separate value: server/.env → INAUGURATION_KEY — change it from the
+  default before the real event.
+  ======================================================================
+-->
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>उद्घाटन Admin | Gaon Sathi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Mukta:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .ina-wrap{ max-width:560px; margin:0 auto; padding:28px 18px 80px; }
+  .ina-card{ display:block; background:#fff; border-radius:18px; padding:26px 22px; box-shadow:0 6px 24px rgba(0,0,0,.08); }
+  .ina-card[hidden]{ display:none; }
+  .ina-status{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:14px; margin-bottom:18px; padding:12px 14px; border-radius:12px; }
+  .ina-status.locked{ background:var(--brick-light,#fde3e0); color:var(--brick,#a92318); }
+  .ina-status.open{ background:var(--green-light,#e2f5e6); color:var(--green,#1c7a3a); }
+  .ina-qr{ display:flex; justify-content:center; padding:18px 0; }
+  .ina-qr canvas{ border-radius:12px; box-shadow:0 4px 16px rgba(0,0,0,.12); }
+  .ina-link-box{ display:flex; gap:8px; margin:14px 0; }
+  .ina-link-box input{ flex:1; padding:11px 12px; border-radius:10px; border:1px solid var(--cream2,#eee); font-size:12.5px; font-family:monospace; }
+  .ina-hint{ font-size:12.5px; color:var(--ink-soft,#777); margin:10px 0 4px; line-height:1.6; }
+  .ina-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .ina-row .btn{ flex:1; min-width:140px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="navwrap">
+    <div class="logo">
+      <div class="mark">🌻</div>
+      <div>
+        <h1>गाँव साथी</h1>
+        <span class="eng">INAUGURATE ADMIN</span>
+      </div>
+    </div>
+    <button class="btn outline adm-logout" id="admLogoutBtn" hidden>लॉगआउट</button>
+  </div>
+</header>
+
+<main class="ina-wrap">
+
+  <!-- LOGIN SCREEN -->
+  <section class="adm-login" id="admLogin">
+    <div class="adm-login-card">
+      <h2>🔒 Admin लॉगिन</h2>
+      <p>उद्घाटन QR कोड देखने के लिए पासवर्ड डालें</p>
+      <input type="password" id="admPassword" placeholder="पासवर्ड" autocomplete="current-password">
+      <button class="btn" id="admLoginBtn">लॉगिन करें</button>
+      <p class="adm-error" id="admLoginError" hidden></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section class="ina-card" id="admDash" hidden>
+    <div id="inaStatus" class="ina-status locked">⏳ लोड हो रहा है...</div>
+
+    <div class="ina-qr" id="inaQrWrap"></div>
+
+    <p class="ina-hint">यही QR कोड प्रिंट/दिखाएँ। VP सर जब इसे अपने फ़ोन से स्कैन करेंगे, तभी होमपेज का पर्दा (curtain) खुलेगा — और उसके बाद यह हर किसी के लिए हमेशा के लिए खुला रहेगा।<br>
+    <span class="eng">Print/display this QR. The homepage curtain opens only when VP sir scans it with his phone — after that it stays open for everyone.</span></p>
+
+    <div class="ina-link-box">
+      <input type="text" id="inaLinkInput" readonly>
+      <button class="btn outline adm-small-btn" id="inaCopyBtn">Copy</button>
+    </div>
+
+    <div class="ina-row">
+      <button class="btn outline" id="inaRefreshBtn">🔄 स्थिति ताज़ा करें</button>
+      <button class="btn outline" id="inaResetBtn">🔁 फिर से लॉक करें (टेस्ट के लिए)</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="inaugurate.js"></script>
+</body>
+</html>
