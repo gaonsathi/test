@@ -251,7 +251,7 @@
   .scene-layer{position:absolute;inset:0;will-change:transform;}
   .sun-rays{
     position:absolute;top:-2px;left:50%;transform:translateX(-50%);
-    width:170px;height:170px;border-radius:50%;
+    width:170px;height:170px;border-radius:50%;z-index:5;
     background:repeating-conic-gradient(from 0deg, rgba(255,196,104,0.4) 0deg 3deg, transparent 3deg 16deg);
     filter:blur(1.5px);opacity:.6;
     animation:sun-rotate 55s linear infinite;
@@ -260,7 +260,7 @@
   @keyframes sun-rotate{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(360deg);}}
   .sun{
     position:absolute;top:38px;left:50%;transform:translateX(-50%);
-    width:90px;height:90px;border-radius:50%;
+    width:90px;height:90px;border-radius:50%;z-index:6;
     background:radial-gradient(circle at 38% 32%,#FFFCF0 0%,#FFF3C4 12%,#FFDD8A 32%,#FFB347 55%,var(--saffron) 75%,var(--saffron-dark) 100%);
     box-shadow:inset -8px -8px 16px rgba(193,68,14,0.4), inset 5px 5px 12px rgba(255,255,255,0.55), 0 0 55px 16px rgba(255,159,28,0.45);
     animation:sun-glow 5s ease-in-out infinite;
@@ -279,14 +279,37 @@
   .cloud2:after{width:24px;height:24px;top:-10px;left:36px;}
   @keyframes drift{from{transform:translateX(0);}to{transform:translateX(140vw);}}
 
+  .school-building{
+    position:absolute;top:16px;left:0;right:0;
+    width:100%;height:308px;pointer-events:none;
+    background-image:url('../images/school-building.png');
+    background-repeat:no-repeat;background-position:center top;background-size:cover;
+    filter:saturate(.92) contrast(.97) brightness(1.03);
+    opacity:.92;
+    animation:building-shimmer 8s ease-in-out infinite;
+  }
+  @keyframes building-shimmer{
+    0%,100%{opacity:.88;}
+    50%{opacity:.98;}
+  }
+  @media(max-width:640px){
+    .school-building{top:44px;height:205px;}
+  }
+
   .hills{position:absolute;bottom:0;left:0;width:100%;}
   .hill{position:absolute;bottom:0;left:0;width:140%;border-radius:50% 50% 0 0/100% 100% 0 0;}
   .hill1{
-    height:70px;background:#3E8863;left:-10%;
-    background-image:repeating-linear-gradient(96deg,rgba(255,255,255,.06) 0 5px,transparent 5px 13px);
+    height:48px;left:-10%;
+    background:linear-gradient(to bottom, rgba(62,136,99,0) 0%, rgba(62,136,99,.55) 45%, rgba(62,136,99,.88) 100%);
   }
-  .hill2{height:100px;background:#2D6A4F;left:-20%;}
-  .hill3{height:60px;background:#265A42;left:-5%;}
+  .hill2{
+    height:68px;left:-20%;
+    background:linear-gradient(to bottom, rgba(45,106,79,0) 0%, rgba(45,106,79,.55) 40%, rgba(45,106,79,.9) 100%);
+  }
+  .hill3{
+    height:40px;left:-5%;
+    background:linear-gradient(to bottom, rgba(38,90,66,0) 0%, rgba(38,90,66,.6) 50%, rgba(38,90,66,.92) 100%);
+  }
 
   /* ---- village trees on the hillside ---- */
   .tree{
