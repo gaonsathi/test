@@ -298,18 +298,30 @@
   }
 
   .hills{position:absolute;bottom:0;left:0;width:100%;}
-  .hill{position:absolute;bottom:0;left:0;width:140%;border-radius:50% 50% 0 0/100% 100% 0 0;}
+  .hill{
+    position:absolute;bottom:0;left:0;width:140%;
+    border-radius:50% 50% 0 0/100% 100% 0 0;
+  }
   .hill1{
-    height:48px;left:-10%;
-    background:linear-gradient(to bottom, rgba(62,136,99,0) 0%, rgba(62,136,99,.55) 45%, rgba(62,136,99,.88) 100%);
+    height:44px;left:-10%;
+    background:
+      radial-gradient(ellipse 60% 100% at 50% -10%, rgba(255,255,255,.28) 0%, transparent 60%),
+      linear-gradient(to bottom, rgba(62,136,99,0) 0%, rgba(62,136,99,.5) 42%, rgba(62,136,99,.85) 100%);
+    box-shadow:inset 0 10px 14px -8px rgba(255,255,255,.35), inset 0 -6px 10px -4px rgba(10,40,26,.3);
   }
   .hill2{
-    height:68px;left:-20%;
-    background:linear-gradient(to bottom, rgba(45,106,79,0) 0%, rgba(45,106,79,.55) 40%, rgba(45,106,79,.9) 100%);
+    height:60px;left:-20%;
+    background:
+      radial-gradient(ellipse 55% 100% at 45% -8%, rgba(255,255,255,.22) 0%, transparent 55%),
+      linear-gradient(to bottom, rgba(45,106,79,0) 0%, rgba(45,106,79,.5) 38%, rgba(45,106,79,.88) 100%);
+    box-shadow:inset 0 12px 16px -9px rgba(255,255,255,.3), inset 0 -8px 14px -6px rgba(6,30,20,.35);
   }
   .hill3{
-    height:40px;left:-5%;
-    background:linear-gradient(to bottom, rgba(38,90,66,0) 0%, rgba(38,90,66,.6) 50%, rgba(38,90,66,.92) 100%);
+    height:36px;left:-5%;
+    background:
+      radial-gradient(ellipse 60% 100% at 55% -10%, rgba(255,255,255,.2) 0%, transparent 55%),
+      linear-gradient(to bottom, rgba(38,90,66,0) 0%, rgba(38,90,66,.55) 46%, rgba(38,90,66,.9) 100%);
+    box-shadow:inset 0 8px 12px -7px rgba(255,255,255,.28), inset 0 -6px 10px -4px rgba(4,24,16,.35);
   }
 
   /* ---- village trees on the hillside ---- */
