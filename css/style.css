@@ -245,7 +245,7 @@
 
   /* ---------- HOME HERO SCENE ---------- */
   .hero-scene{
-    position:relative;height:400px;overflow:hidden;
+    position:relative;height:460px;overflow:hidden;
     background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 55%, rgba(76,154,114,0) 56%, rgba(45,106,79,.55) 80%, var(--green) 100%);
   }
   .scene-layer{position:absolute;inset:0;will-change:transform;}
@@ -281,7 +281,7 @@
 
   .school-building{
     position:absolute;top:0;left:0;right:0;
-    width:100%;height:308px;pointer-events:none;
+    width:100%;height:355px;pointer-events:none;
     background-image:url('../images/school-building.png');
     background-repeat:no-repeat;background-position:center top;background-size:cover;
     filter:saturate(.92) contrast(.97) brightness(1.03);
@@ -295,8 +295,8 @@
     50%{opacity:.98;}
   }
   @media(max-width:640px){
-    .hero-scene{height:360px;}
-    .school-building{top:0;height:210px;}
+    .hero-scene{height:410px;}
+    .school-building{top:0;height:250px;}
   }
 
   .hills{position:absolute;bottom:0;left:0;width:100%;}
