@@ -296,7 +296,16 @@
   }
   @media(max-width:640px){
     .hero-scene{height:410px;}
-    .school-building{top:0;height:250px;}
+    .school-building{
+      top:0;height:250px;
+      /* On phones the compressed photo brings the roofline/signboard up
+         into the same vertical band the .sun disc sits in, so the sun
+         was drawing IN FRONT of the school. Raising the building above
+         the sun/sun-rays here (desktop is untouched) puts the school in
+         front and the sun behind it, so it reads as a glow behind the
+         building instead of floating on top of it. */
+      z-index:8;
+    }
   }
 
   .hills{position:absolute;bottom:0;left:0;width:100%;}
