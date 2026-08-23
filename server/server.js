@@ -97,7 +97,55 @@ const SCHEMES_FILE = path.join(__dirname, 'data', 'schemes.json');
 const INAUGURATION_KEY = process.env.INAUGURATION_KEY || 'badlo-ye-secret-key';
 const INAUGURATE_FILE = path.join(__dirname, 'data', 'inaugurate.json');
 
-function loadInaugurate() {
+// ---------------------------------------------------------------------
+//  WHY THIS ISN'T JUST A LOCAL FILE ANYMORE
+//  On Render's FREE web service plan there is no persistent disk: the
+//  container's filesystem is thrown away every time the instance spins
+//  down (after ~15 min idle) and a new visitor wakes it back up. That
+//  meant VP sir would cut the ribbon, inaugurate.json would flip to
+//  {"unlocked":true} on disk, everyone connected right then would see
+//  the open site... and then the FIRST time the server slept and woke
+//  again, it restarted from a fresh checkout of the repo — which still
+//  has {"unlocked":false} committed in git — silently re-locking the
+//  curtain for every visitor after that, forever, until unlocked again
+//  manually. That's the exact bug being fixed here.
+//
+//  Fix: keep the flag in Upstash Redis (a free, no-credit-card-required
+//  key-value store reachable over plain HTTPS — no persistent disk
+//  needed, survives every Render restart/redeploy). If the two env
+//  vars below aren't set, this transparently falls back to the old
+//  local-file behaviour so local development still works with zero
+//  setup — it just won't survive a Render free-tier restart until you
+//  add the env vars.
+//
+//  Setup (2 minutes, no credit card):
+//    1) https://console.upstash.com → Create Database (free tier)
+//    2) Copy "REST URL" and "REST TOKEN" from that database's page
+//    3) In Render → your service → Environment, add:
+//         UPSTASH_REDIS_REST_URL   = https://xxxx.upstash.io
+//         UPSTASH_REDIS_REST_TOKEN = xxxxxxxxxxxx
+//    4) Redeploy. Done — the ribbon-cutting now survives restarts.
+// ---------------------------------------------------------------------
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || '';
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+const UPSTASH_KEY = 'gaonsathi_inaugurate_state';
+let warnedNoUpstash = false;
+
+async function upstashCommand(cmd) {
+  const r = await fetch(UPSTASH_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${UPSTASH_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cmd)
+  });
+  if (!r.ok) throw new Error(`Upstash command failed: ${r.status}`);
+  const data = await r.json();
+  return data.result;
+}
+
+function loadInaugurateFromFile() {
   try {
     const raw = fs.readFileSync(INAUGURATE_FILE, 'utf8');
     const data = JSON.parse(raw);
@@ -107,9 +155,40 @@ function loadInaugurate() {
   }
 }
 
-function saveInaugurate(state) {
+function saveInaugurateToFile(state) {
   fs.mkdirSync(path.dirname(INAUGURATE_FILE), { recursive: true });
   fs.writeFileSync(INAUGURATE_FILE, JSON.stringify(state, null, 2), 'utf8');
+}
+
+async function loadInaugurate() {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+    if (!warnedNoUpstash) {
+      warnedNoUpstash = true;
+      console.warn('⚠ UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN not set — इनॉगरेशन स्टेटस local file में रखा जा रहा है, जो Render free tier पर restart होने पर रीसेट हो जाएगा। server.js में ऊपर दिए गए comment के मुताबिक Upstash सेट करें।');
+    }
+    return loadInaugurateFromFile();
+  }
+  try {
+    const raw = await upstashCommand(['GET', UPSTASH_KEY]);
+    if (!raw) return { unlocked: false, unlockedAt: null };
+    const data = JSON.parse(raw);
+    return { unlocked: !!data.unlocked, unlockedAt: data.unlockedAt || null };
+  } catch (err) {
+    console.error('Upstash load failed, falling back to local file for this read:', err.message);
+    return loadInaugurateFromFile();
+  }
+}
+
+async function saveInaugurate(state) {
+  // Always also write locally so /admin still works instantly if Upstash
+  // has a hiccup, and so local dev without any env vars keeps working.
+  saveInaugurateToFile(state);
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
+  try {
+    await upstashCommand(['SET', UPSTASH_KEY, JSON.stringify(state)]);
+  } catch (err) {
+    console.error('Upstash save failed — inauguration flag may not survive a restart until this is fixed:', err.message);
+  }
 }
 
 function loadSchemes() {
@@ -424,17 +503,17 @@ app.post('/api/gemini/search', async (req, res) => {
 // Public: has the curtain been inaugurated yet? Polled by intro/intro.js
 // on every page load so it knows whether to show the locked curtain,
 // the "ready to open" tap-button screen, or nothing at all.
-app.get('/api/inaugurate/status', (req, res) => {
-  res.json(loadInaugurate());
+app.get('/api/inaugurate/status', async (req, res) => {
+  res.json(await loadInaugurate());
 });
 
 // Checks the key WITHOUT unlocking anything — lets intro/intro.js show
 // VP sir a "तैयार है, खोलने के लिए टैप करें" button only when the QR
 // code he scanned is actually genuine, without cutting the ribbon
 // until he actually taps it.
-app.get('/api/inaugurate/verify', (req, res) => {
+app.get('/api/inaugurate/verify', async (req, res) => {
   const key = req.query.key || '';
-  const current = loadInaugurate();
+  const current = await loadInaugurate();
   if (current.unlocked) return res.json({ valid: true, unlocked: true });
   res.json({ valid: !!key && key === INAUGURATION_KEY, unlocked: false });
 });
@@ -442,15 +521,15 @@ app.get('/api/inaugurate/verify', (req, res) => {
 // The ribbon-cutting itself. Called by intro/intro.js only after VP sir
 // taps the button on his phone. No admin key needed here on purpose —
 // the SECRET LINK ITSELF is the credential, same as any invite link.
-app.post('/api/inaugurate/unlock', (req, res) => {
+app.post('/api/inaugurate/unlock', async (req, res) => {
   const key = req.get('x-inaugurate-key') || (req.body && req.body.key) || '';
-  const current = loadInaugurate();
+  const current = await loadInaugurate();
   if (current.unlocked) return res.json(current); // already open — idempotent
   if (!key || key !== INAUGURATION_KEY) {
     return res.status(401).json({ error: 'अमान्य कोड / Invalid unlock code' });
   }
   const state = { unlocked: true, unlockedAt: new Date().toISOString() };
-  saveInaugurate(state);
+  await saveInaugurate(state);
   broadcastCurtainUnlock(state); // push to every browser watching the curtain right now
   res.json(state);
 });
@@ -458,14 +537,14 @@ app.post('/api/inaugurate/unlock', (req, res) => {
 // Admin-only: lock it again (handy for rehearsing/testing before the
 // real event) and fetch the secret link to build the QR code from.
 // Both require the shared ADMIN_PASSWORD, same as the योजना panel.
-app.post('/api/inaugurate/reset', requireAdmin, (req, res) => {
+app.post('/api/inaugurate/reset', requireAdmin, async (req, res) => {
   const state = { unlocked: false, unlockedAt: null };
-  saveInaugurate(state);
+  await saveInaugurate(state);
   res.json(state);
 });
 
-app.get('/api/inaugurate/link', requireAdmin, (req, res) => {
-  res.json({ key: INAUGURATION_KEY, ...loadInaugurate() });
+app.get('/api/inaugurate/link', requireAdmin, async (req, res) => {
+  res.json({ key: INAUGURATION_KEY, ...(await loadInaugurate()) });
 });
 
 app.get('/api/health', (req, res) => {
@@ -891,8 +970,8 @@ const liveWss = new WebSocket.Server({ noServer: true });
 // the button. Each locked browser holds one WebSocket to /curtain and
 // just listens — the moment /api/inaugurate/unlock succeeds above,
 // broadcastCurtainUnlock() pushes one "unlocked" message to all.
-curtainWss.on('connection', (ws) => {
-  const current = loadInaugurate();
+curtainWss.on('connection', async (ws) => {
+  const current = await loadInaugurate();
   try {
     ws.send(JSON.stringify({
       type: 'status',
