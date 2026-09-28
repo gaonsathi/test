@@ -246,6 +246,7 @@
   /* ---------- HOME HERO SCENE ---------- */
   .hero-scene{
     position:relative;height:460px;overflow:hidden;
+    margin-top:-30px;
     background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 55%, rgba(76,154,114,0) 56%, rgba(45,106,79,.55) 80%, var(--green) 100%);
   }
   .scene-layer{position:absolute;inset:0;will-change:transform;}
@@ -295,7 +296,7 @@
     50%{opacity:.98;}
   }
   @media(max-width:640px){
-    .hero-scene{height:410px;}
+    .hero-scene{height:410px;margin-top:-18px;}
     .school-building{
       top:0;height:250px;
       /* On phones the compressed photo brings the roofline/signboard up
@@ -372,6 +373,9 @@
   .b1{top:0;left:-30px;animation:fly-across 24s linear infinite;}
   .b2{top:16px;left:-60px;animation:fly-across 30s linear infinite;animation-delay:-9s;}
   .b3{top:6px;left:-45px;animation:fly-across 27s linear infinite;animation-delay:-17s;}
+  .b4{top:26px;left:-70px;animation:fly-across 26s linear infinite;animation-delay:-4s;}
+  .b5{top:10px;left:-20px;animation:fly-across 32s linear infinite;animation-delay:-22s;}
+  .b6{top:34px;left:-50px;animation:fly-across 28s linear infinite;animation-delay:-13s;}
   @keyframes fly-across{
     0%{transform:translateX(0) translateY(0);}
     50%{transform:translateX(70vw) translateY(-8px);}
