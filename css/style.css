@@ -246,8 +246,8 @@
   /* ---------- HOME HERO SCENE ---------- */
   .hero-scene{
     position:relative;height:460px;overflow:hidden;
-    margin-top:-30px;
-    background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 55%, rgba(76,154,114,0) 56%, rgba(45,106,79,.55) 80%, var(--green) 100%);
+    margin-top:-9vw;
+    background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 65%, rgba(76,154,114,0) 66%, rgba(45,106,79,.55) 88%, var(--green) 100%);
   }
   .scene-layer{position:absolute;inset:0;will-change:transform;}
   .sun-rays{
@@ -288,15 +288,15 @@
     filter:saturate(1.05) contrast(1.06) brightness(1.0);
     opacity:1;
     animation:building-shimmer 8s ease-in-out infinite;
-    -webkit-mask-image:linear-gradient(to bottom, #000 78%, transparent 100%);
-    mask-image:linear-gradient(to bottom, #000 78%, transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom, #000 90%, transparent 100%);
+    mask-image:linear-gradient(to bottom, #000 90%, transparent 100%);
   }
   @keyframes building-shimmer{
     0%,100%{opacity:.88;}
     50%{opacity:.98;}
   }
   @media(max-width:640px){
-    .hero-scene{height:410px;margin-top:-18px;}
+    .hero-scene{height:410px;}
     .school-building{
       top:0;height:250px;
       /* On phones the compressed photo brings the roofline/signboard up
