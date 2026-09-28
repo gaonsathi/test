@@ -250,7 +250,7 @@
      it from getting absurdly tall/short on extreme screens. */
   .hero-scene{
     position:relative;overflow:hidden;
-    height:clamp(320px, 65vh, 620px);
+    height:clamp(320px, 65vh, 1000px);
     margin-top:-30px;
     background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 26%, #FFB25A 56%, rgba(76,154,114,0) 58%, rgba(45,106,79,.55) 78%, var(--green) 100%);
   }
