@@ -393,3 +393,38 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   padding:0 !important;
   border-radius:0 !important;
 }
+
+
+/* =====================================================================
+   RESPONSIVE CURTAIN TEXT — sizes follow the screen width (vw units),
+   no fixed px / clamp() limits, so the text scales with every screen.
+   Placed last so it overrides the earlier fixed sizes.
+   ===================================================================== */
+/* School name (top centre) */
+.gs-brand-center{ width:80vw; max-width:none; }
+.gs-brand-center .gs-brand-premium{ font-size:3.3vw; letter-spacing:.03em; }
+/* Developer credit (left) */
+.gs-brand-left{ max-width:22vw; }
+.gs-brand-left .gs-brand-premium{ font-size:2.4vw; letter-spacing:.03em; }
+.gs-dev-label{ font-size:.85vw; letter-spacing:.2em; }
+.gs-brand-caption{ font-size:.75vw; }
+/* "Waiting for Principal Sir" message box */
+.gs-lock-premium{ font-size:2.3vw; letter-spacing:.06em; }
+.gs-lock-msg b{ font-size:2vw; }
+.gs-lock-msg span{ font-size:1vw; }
+.gs-lock-msg em{ font-size:1vw; }
+.gs-open-btn{ font-size:1.3vw; }
+
+@media(max-width:650px){
+  .gs-brand-center{ width:92vw; }
+  .gs-brand-center .gs-brand-premium{ font-size:4.6vw; }
+  .gs-brand-left{ max-width:60vw; }
+  .gs-brand-left .gs-brand-premium{ font-size:4.6vw; }
+  .gs-dev-label{ font-size:2.4vw; }
+  .gs-brand-caption{ font-size:2.2vw; }
+  .gs-lock-premium{ font-size:5.4vw; }
+  .gs-lock-msg b{ font-size:5vw; }
+  .gs-lock-msg span{ font-size:3vw; }
+  .gs-lock-msg em{ font-size:3vw; }
+  .gs-open-btn{ font-size:4vw; }
+}
