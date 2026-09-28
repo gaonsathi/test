@@ -246,7 +246,7 @@
   /* ---------- HOME HERO SCENE ---------- */
   .hero-scene{
     position:relative;height:460px;overflow:hidden;
-    margin-top:-9vw;
+    margin-top:clamp(-42px,-9vw,-22px);
     background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 65%, rgba(76,154,114,0) 66%, rgba(45,106,79,.55) 88%, var(--green) 100%);
   }
   .scene-layer{position:absolute;inset:0;will-change:transform;}
