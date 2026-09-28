@@ -244,11 +244,15 @@
   @keyframes fadein{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 
   /* ---------- HOME HERO SCENE ---------- */
+  /* Height is tied to the viewport's own height (vh), not a fixed px
+     value, so the pic section always takes up the SAME proportion of
+     the screen on any device — big monitor or small phone. Clamp keeps
+     it from getting absurdly tall/short on extreme screens. */
   .hero-scene{
-    position:relative;height:460px;overflow:hidden;
-    margin-top:-41px; /* = 9% of this section's own 460px height, fixed so it
-                          doesn't grow with viewport width on big screens */
-    background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 30%, #FFB25A 65%, rgba(76,154,114,0) 66%, rgba(45,106,79,.55) 88%, var(--green) 100%);
+    position:relative;overflow:hidden;
+    height:clamp(320px, 60vh, 620px);
+    margin-top:-12px;
+    background:linear-gradient(to bottom,#FFD98A 0%, #FFC468 26%, #FFB25A 56%, rgba(76,154,114,0) 58%, rgba(45,106,79,.55) 78%, var(--green) 100%);
   }
   .scene-layer{position:absolute;inset:0;will-change:transform;}
   .sun-rays{
@@ -288,32 +292,23 @@
   @keyframes drift{from{transform:translateX(0);}to{transform:translateX(140vw);}}
 
   .school-building{
-    position:absolute;top:0;left:0;right:0;
-    width:100%;height:355px;pointer-events:none;
+    position:absolute;top:0;left:0;right:0;bottom:0;
+    width:100%;height:100%;pointer-events:none;
     background-image:url('../images/school-building.png');
     background-repeat:no-repeat;background-position:center top;background-size:cover;
     filter:saturate(1.05) contrast(1.06) brightness(1.0);
     opacity:1;
     animation:building-shimmer 8s ease-in-out infinite;
-    -webkit-mask-image:linear-gradient(to bottom, #000 90%, transparent 100%);
-    mask-image:linear-gradient(to bottom, #000 90%, transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom, #000 60%, transparent 100%);
+    mask-image:linear-gradient(to bottom, #000 60%, transparent 100%);
   }
   @keyframes building-shimmer{
     0%,100%{opacity:.88;}
     50%{opacity:.98;}
   }
   @media(max-width:640px){
-    .hero-scene{height:410px;margin-top:-37px;} /* = 9% of this breakpoint's own 410px height */
-    .school-building{
-      top:0;height:250px;
-      /* On phones the compressed photo brings the roofline/signboard up
-         into the same vertical band the .sun disc sits in, so the sun
-         was drawing IN FRONT of the school. Raising the building above
-         the sun/sun-rays here (desktop is untouched) puts the school in
-         front and the sun behind it, so it reads as a glow behind the
-         building instead of floating on top of it. */
-      z-index:8;
-    }
+    /* Height/margin now scale via vh above; nothing breakpoint-specific
+       needed here for the scene itself any more. */
   }
 
   .hills{position:absolute;bottom:0;left:0;width:100%;}
