@@ -126,43 +126,22 @@ const INAUGURATE_FILE = path.join(__dirname, 'data', 'inaugurate.json');
 //         UPSTASH_REDIS_REST_TOKEN = xxxxxxxxxxxx
 //    4) Redeploy. Done — the ribbon-cutting now survives restarts.
 // ---------------------------------------------------------------------
-// Clean up the two env values — copy/paste mistakes are the #1 reason
-// Upstash "doesn't work": stray spaces/newlines, surrounding quotes,
-// a missing https://, a trailing slash, or "Bearer " pasted into the token.
-function cleanEnv(v) { return String(v || '').trim().replace(/^["']+|["']+$/g, '').trim(); }
-function cleanUpstashUrl(v) {
-  let u = cleanEnv(v);
-  if (!u) return '';
-  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
-  return u.replace(/\/+$/, '');
-}
-const UPSTASH_URL = cleanUpstashUrl(process.env.UPSTASH_REDIS_REST_URL);
-const UPSTASH_TOKEN = cleanEnv(process.env.UPSTASH_REDIS_REST_TOKEN).replace(/^Bearer\s+/i, '');
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || '';
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
 const UPSTASH_KEY = 'gaonsathi_inaugurate_state';
 let warnedNoUpstash = false;
 
 async function upstashCommand(cmd) {
-  let r;
-  try {
-    r = await fetch(UPSTASH_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${UPSTASH_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(cmd)
-    });
-  } catch (e) {
-    const cause = e && e.cause && (e.cause.code || e.cause.message) ? ` (${e.cause.code || e.cause.message})` : '';
-    throw new Error(`Cannot reach Upstash at "${UPSTASH_URL}" — ${e.message}${cause}. URL galat ho sakta hai.`);
-  }
-  if (!r.ok) {
-    let detail = '';
-    try { detail = (await r.text()).slice(0, 200); } catch (e) {}
-    throw new Error(`Upstash HTTP ${r.status} ${detail}`.trim());
-  }
+  const r = await fetch(UPSTASH_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${UPSTASH_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cmd)
+  });
+  if (!r.ok) throw new Error(`Upstash command failed: ${r.status}`);
   const data = await r.json();
-  if (data && data.error) throw new Error(`Upstash error: ${data.error}`);
   return data.result;
 }
 
@@ -212,19 +191,7 @@ async function saveInaugurate(state) {
   }
 }
 
-// ---------------------------------------------------------------------
-//  SCHEMES STORAGE — Upstash Redis (same store as the inauguration flag)
-//  Render's free plan wipes local files on every restart/redeploy, so
-//  schemes added from the admin panel used to vanish and revert to
-//  whatever schemes.json is committed in git. Now the full list lives
-//  in Upstash under SCHEMES_KEY. The local file is only used:
-//    - as the one-time seed (first run, when Upstash has no list yet)
-//    - as the fallback when Upstash env vars are not set (local dev)
-// ---------------------------------------------------------------------
-const SCHEMES_KEY = 'gaonsathi_schemes';
-const upstashEnabled = () => !!(UPSTASH_URL && UPSTASH_TOKEN);
-
-function loadSchemesFromFile() {
+function loadSchemes() {
   try {
     const raw = fs.readFileSync(SCHEMES_FILE, 'utf8');
     const data = JSON.parse(raw);
@@ -234,52 +201,10 @@ function loadSchemesFromFile() {
   }
 }
 
-function saveSchemesToFile(list) {
-  try {
-    fs.mkdirSync(path.dirname(SCHEMES_FILE), { recursive: true });
-    fs.writeFileSync(SCHEMES_FILE, JSON.stringify(list, null, 2), 'utf8');
-  } catch (err) {
-    console.warn('schemes.json local write failed (ok on read-only disks):', err.message);
-  }
+function saveSchemes(list) {
+  fs.mkdirSync(path.dirname(SCHEMES_FILE), { recursive: true });
+  fs.writeFileSync(SCHEMES_FILE, JSON.stringify(list, null, 2), 'utf8');
 }
-
-// Throws if Upstash is configured but unreachable. Writers MUST use this
-// (never a silent fallback), otherwise a temporary Upstash error could
-// make a write start from the stale git copy and overwrite real data.
-async function loadSchemesStrict() {
-  if (!upstashEnabled()) return loadSchemesFromFile();
-  const raw = await upstashCommand(['GET', SCHEMES_KEY]);
-  if (raw === null || raw === undefined) {
-    // First run: Upstash has no list yet — seed it from schemes.json.
-    const seed = loadSchemesFromFile();
-    await upstashCommand(['SET', SCHEMES_KEY, JSON.stringify(seed)]);
-    console.log(`Schemes seeded into Upstash from schemes.json (${seed.length} items).`);
-    return seed;
-  }
-  const data = JSON.parse(raw);
-  return Array.isArray(data) ? data : [];
-}
-
-// Read-only paths (public site): never throw, fall back to the file.
-async function loadSchemes() {
-  try {
-    return await loadSchemesStrict();
-  } catch (err) {
-    console.error('Upstash schemes load failed, serving local file copy:', err.message);
-    return loadSchemesFromFile();
-  }
-}
-
-async function saveSchemes(list) {
-  if (upstashEnabled()) {
-    await upstashCommand(['SET', SCHEMES_KEY, JSON.stringify(list)]); // throws on failure
-  } else if (!warnedNoUpstashSchemes) {
-    warnedNoUpstashSchemes = true;
-    console.warn('⚠ Upstash env vars not set — schemes are saved only to the local file and WILL be lost on Render free-tier restarts.');
-  }
-  saveSchemesToFile(list); // local backup / local-dev storage
-}
-let warnedNoUpstashSchemes = false;
 
 function slugify(title) {
   return String(title || '')
@@ -310,15 +235,15 @@ app.post('/api/admin/login', (req, res) => {
 
 // List schemes — public gets only published ones; admin (valid key)
 // gets everything, including drafts, so the admin panel can manage them.
-app.get('/api/schemes', async (req, res) => {
-  const all = await loadSchemes();
+app.get('/api/schemes', (req, res) => {
+  const all = loadSchemes();
   const list = isAdmin(req) ? all : all.filter(s => s.published !== false);
   res.json(list);
 });
 
 // Single scheme by slug — public only sees it if published.
-app.get('/api/schemes/:slug', async (req, res) => {
-  const all = await loadSchemes();
+app.get('/api/schemes/:slug', (req, res) => {
+  const all = loadSchemes();
   const item = all.find(s => s.slug === req.params.slug);
   if (!item) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
   if (item.published === false && !isAdmin(req)) {
@@ -328,13 +253,12 @@ app.get('/api/schemes/:slug', async (req, res) => {
 });
 
 // Create a new scheme article (admin only)
-app.post('/api/schemes', requireAdmin, async (req, res) => {
+app.post('/api/schemes', requireAdmin, (req, res) => {
   const body = req.body || {};
   if (!body.title || !body.title.trim()) {
     return res.status(400).json({ error: 'शीर्षक ज़रूरी है / Title is required' });
   }
-  try {
-  const all = await loadSchemesStrict();
+  const all = loadSchemes();
   // Prefer an English title for the slug when available (Hindi-only
   // titles produce an empty slug since \w only matches ASCII letters),
   // falling back to the Hindi title, then finally a timestamp so it
@@ -356,18 +280,13 @@ app.post('/api/schemes', requireAdmin, async (req, res) => {
     updatedAt: now
   };
   all.unshift(item);
-  await saveSchemes(all);
+  saveSchemes(all);
   res.status(201).json(item);
-  } catch (err) {
-    console.error('Create scheme failed:', err.message);
-    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error): ' + err.message });
-  }
 });
 
 // Update an existing scheme article (admin only)
-app.put('/api/schemes/:slug', requireAdmin, async (req, res) => {
-  try {
-  const all = await loadSchemesStrict();
+app.put('/api/schemes/:slug', requireAdmin, (req, res) => {
+  const all = loadSchemes();
   const idx = all.findIndex(s => s.slug === req.params.slug);
   if (idx === -1) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
 
@@ -386,26 +305,17 @@ app.put('/api/schemes/:slug', requireAdmin, async (req, res) => {
     faqs: Array.isArray(body.faqs) ? body.faqs : (all[idx].faqs || []),
     updatedAt: new Date().toISOString()
   };
-  await saveSchemes(all);
+  saveSchemes(all);
   res.json(all[idx]);
-  } catch (err) {
-    console.error('Update scheme failed:', err.message);
-    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error): ' + err.message });
-  }
 });
 
 // Delete a scheme article (admin only)
-app.delete('/api/schemes/:slug', requireAdmin, async (req, res) => {
-  try {
-  const all = await loadSchemesStrict();
+app.delete('/api/schemes/:slug', requireAdmin, (req, res) => {
+  const all = loadSchemes();
   const next = all.filter(s => s.slug !== req.params.slug);
   if (next.length === all.length) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
-  await saveSchemes(next);
+  saveSchemes(next);
   res.json({ ok: true });
-  } catch (err) {
-    console.error('Delete scheme failed:', err.message);
-    res.status(500).json({ error: 'डिलीट नहीं हो पाया (storage error): ' + err.message });
-  }
 });
 
 function endpointFor(model) {
@@ -637,18 +547,8 @@ app.get('/api/inaugurate/link', requireAdmin, async (req, res) => {
   res.json({ key: INAUGURATION_KEY, ...(await loadInaugurate()) });
 });
 
-// Open /api/health in the browser to see whether Upstash really works.
-app.get('/api/health', async (req, res) => {
-  let upstash = 'not configured (env vars missing)';
-  if (UPSTASH_URL && UPSTASH_TOKEN) {
-    try {
-      const pong = await upstashCommand(['PING']);
-      upstash = pong === 'PONG' ? 'OK (connected)' : `unexpected reply: ${pong}`;
-    } catch (e) {
-      upstash = 'FAILED: ' + e.message;
-    }
-  }
-  res.json({ ok: true, upstash, keyConfigured: !!GEMINI_API_KEY, model: GEMINI_MODEL, searchModel: GEMINI_SEARCH_MODEL, ttsModel: GEMINI_TTS_MODEL, ttsVoice: GEMINI_TTS_VOICE });
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, keyConfigured: !!GEMINI_API_KEY, model: GEMINI_MODEL, searchModel: GEMINI_SEARCH_MODEL, ttsModel: GEMINI_TTS_MODEL, ttsVoice: GEMINI_TTS_VOICE });
 });
 
 // ===================================================================
@@ -1139,7 +1039,7 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
-server.listen(PORT, async () => {
+server.listen(PORT, () => {
   console.log(`Gaon Sathi server running → http://localhost:${PORT}`);
   console.log(`Admin panel              → http://localhost:${PORT}/admin/admin.html`);
   console.log(`Curtain WebSocket        → ws://localhost:${PORT}/curtain`);
@@ -1147,16 +1047,6 @@ server.listen(PORT, async () => {
   console.log(GEMINI_API_KEY
     ? 'GEMINI_API_KEY loaded ✔'
     : '⚠ GEMINI_API_KEY missing — set it in server/.env');
-  if (!UPSTASH_URL || !UPSTASH_TOKEN) {
-    console.warn('⚠ Upstash env vars NOT set (UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)');
-  } else {
-    try {
-      const pong = await upstashCommand(['PING']);
-      console.log(pong === 'PONG' ? 'Upstash connected ✔' : `⚠ Upstash odd reply: ${pong}`);
-    } catch (e) {
-      console.error('❌ Upstash connection FAILED:', e.message);
-    }
-  }
   console.log(process.env.ADMIN_PASSWORD
     ? 'ADMIN_PASSWORD loaded ✔'
     : '⚠ ADMIN_PASSWORD not set — using default password "gaonsathi123". Set your own in server/.env');
