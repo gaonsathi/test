@@ -428,3 +428,46 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   .gs-lock-msg em{ font-size:3vw; }
   .gs-open-btn{ font-size:4vw; }
 }
+
+
+/* ======================================================================
+   NATURAL PLEATED CURTAIN (driven by makeCurtain() in intro.js)
+   The old sliding-door keyframes (curtain-left/right, gs-final-left/right,
+   velvet-shimmer) are switched off here; the JS engine animates the
+   pleats instead. Keep this block LAST so it wins the cascade.
+   ====================================================================== */
+.gs-curtain-overlay .gs-curtain,
+.gs-curtain-overlay.is-opening .gs-curtain.left,
+.gs-curtain-overlay.is-opening .gs-curtain.right{
+  background:none!important; box-shadow:none!important; overflow:visible!important;
+  animation:none!important; transform:none!important; will-change:auto!important;
+  perspective:1500px;
+}
+.gs-curtain-overlay .gs-curtain:before,
+.gs-curtain-overlay .gs-curtain:after,
+.gs-curtain-overlay.is-opening .gs-curtain:before{content:none!important;animation:none!important}
+.gs-curtain.left{--dir:90deg;  perspective-origin:100% 50%}
+.gs-curtain.right{--dir:270deg; perspective-origin:0% 50%}
+
+/* dark backing so a hairline between two pleats never shows the page */
+.gs-lining{position:absolute;top:-14%;bottom:-14%;left:0;background:linear-gradient(180deg,#3a0610,#1c0207);transform-origin:0 50%;will-change:transform}
+.gs-curtain.right .gs-lining{left:auto;right:0;transform-origin:100% 50%}
+/* soft shadow the leading edge throws on the page as it travels */
+.gs-edge{position:absolute;top:-10%;bottom:-10%;left:0;width:2px;box-shadow:0 0 38px 14px rgba(0,0,0,.45);pointer-events:none;will-change:transform,opacity}
+.gs-curtain.right .gs-edge{left:auto;right:0}
+
+.gs-pleat{
+  position:absolute;top:-14%;bottom:-14%;left:0;   /* bleeds past the screen so perspective never shows a notch at the top/bottom */
+  transform-origin:50% 0;               /* hangs from the rail: hem is free to swing */
+  backface-visibility:hidden;will-change:transform;
+  background:
+    linear-gradient(180deg,rgba(255,215,215,.10) 11%,rgba(255,215,215,0) 30%,rgba(0,0,0,0) 58%,rgba(14,0,4,.72) 96%),
+    var(--fold);
+}
+.gs-curtain.right .gs-pleat{left:auto;right:0}
+/* ridge (light) / valley (dark) positions flip every other pleat, wall→centre */
+.gs-pleat.lit{--fold:linear-gradient(var(--dir),#c9233f 0%,#a60e29 45%,#5c0513 92%,#3d020c 100%)}
+.gs-pleat.dim{--fold:linear-gradient(var(--dir),#3d020c 0%,#5c0513 8%,#a60e29 55%,#c9233f 100%)}
+/* fold-angle driven lighting (--sh / --hl are set every frame by the engine) */
+.gs-pleat:after{content:"";position:absolute;inset:0;background:#10000a;opacity:var(--sh,0);pointer-events:none}
+.gs-pleat:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,225,200,.35),rgba(255,225,200,0) 55%);opacity:var(--hl,0);pointer-events:none;z-index:1}
