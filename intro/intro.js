@@ -38,8 +38,8 @@
     const o=document.createElement('div');
     o.className='gs-curtain-overlay';
     o.innerHTML=`
-      <div class="gs-curtain left"></div>
-      <div class="gs-curtain right"></div>
+      <div class="gs-curtain left"><div class="gs-curtain-bottom"></div></div>
+      <div class="gs-curtain right"><div class="gs-curtain-bottom"></div></div>
       <div class="gs-tie left"></div><div class="gs-tie right"></div>
       <div class="gs-light-burst"></div>
       <div class="gs-brand-layer" aria-hidden="true">
@@ -61,169 +61,8 @@
         </div>
       </div>
     `;
-    o._curtain = makeCurtain(o);
     return o;
   }
-
-  /* ======================================================================
-     NATURAL CURTAIN ENGINE
-     ----------------------------------------------------------------------
-     Each half of the curtain is a row of pleats (flat velvet strips)
-     joined at hinges, like a real stage curtain:
-
-       • Opening = the pleats fold up accordion-style (rotateY), so the
-         fabric GATHERS toward the wall instead of sliding like a door.
-       • The fold wave starts at the leading edge (where it is "pulled")
-         and travels outward to the wall — slow start, heavy middle,
-         soft settle.
-       • The hem lags behind the motion and swings back on a damped
-         spring (skewX from the top rail), so it moves like weight.
-       • Pleat shading is driven by the real fold angle, so ridges and
-         valleys deepen as the fabric bunches up.
-       • Finally the gathered stack is drawn off into the wings.
-     Pure transforms + opacity → GPU friendly, 60fps on phones.
-     ====================================================================== */
-  const PULL_MS = 8200;        // total curtain time (matches the CSS fade-out/confetti timing)
-  const FOLD_SPREAD = 0.27;    // share of the timeline the fold wave takes to travel leading edge → wall
-  const SWEEP_FROM = 0.36;     // when the gathered stack starts being drawn into the wings
-  const SWAY_K = 5.5;          // hem-lag degrees per (half-screen-width / second)
-  const SWAY_MAX = 1.7;        // max hem-lag degrees
-  const RAD = Math.PI / 180;
-  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
-  const frac = n => n - Math.floor(n);
-  const jit = (j, seed, k) => frac(Math.sin((j + 1) * 12.9898 + seed * 78.233 + k * 37.719) * 43758.5453) - 0.5;
-
-  function bezier(x1, y1, x2, y2){
-    const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
-    const cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
-    const X = t => ((ax * t + bx) * t + cx) * t;
-    const Y = t => ((ay * t + by) * t + cy) * t;
-    return x => {
-      if (x <= 0) return 0;
-      if (x >= 1) return 1;
-      let lo = 0, hi = 1, t = x;
-      for (let i = 0; i < 18; i++) { t = (lo + hi) / 2; X(t) < x ? lo = t : hi = t; }
-      return Y(t);
-    };
-  }
-  const easeFold  = bezier(.30, .30, .20, 1);
-  const easeSweep = bezier(.45, 0, .35, 1);
-
-  function makeCurtain(overlay){
-    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const sides = [];
-    [['left', 1], ['right', -1]].forEach(([name, dir], si) => {
-      const el = overlay.querySelector('.gs-curtain.' + name);
-      if (el) sides.push({ el, dir, seed: si * 5.37, strips: [], s: 0, cover: 0, sweep: 0, lead: 0 });
-    });
-    let halfW = 0, N = 0, u = 0, raf = 0;
-
-    function buildSide(sd){
-      sd.el.textContent = '';
-      const mk = cls => { const d = document.createElement('div'); d.className = cls; return d; };
-      sd.lining = mk('gs-lining');
-      sd.edge = mk('gs-edge');
-      sd.el.append(sd.lining, sd.edge);
-      sd.strips = [];
-      for (let j = 0; j < N; j++) {
-        const sign = j % 2 ? -1 : 1;
-        const el = mk('gs-pleat ' + (sign > 0 ? 'lit' : 'dim'));
-        sd.el.appendChild(el);
-        sd.strips.push({
-          el, sign,
-          rest: 15 + jit(j, sd.seed, 1) * 7,        // resting fold angle (organic, never uniform)
-          max: 76 + jit(j, sd.seed, 2) * 8,         // fully gathered fold angle
-          start: FOLD_SPREAD * (N - 1 - j) / (N - 1),
-          k: 52 + (jit(j, sd.seed, 3) + .5) * 22,   // spring stiffness varies a little per pleat
-          ang: 0, av: 0, c: null, th: 0
-        });
-      }
-    }
-
-    function layout(){
-      halfW = (overlay.clientWidth || window.innerWidth) / 2;
-      const cover = halfW + 3; // 3px overlap at the centre seam
-      const n = clamp(Math.round(halfW / 52), 6, 18);
-      sides.forEach(sd => {
-        if (n !== N || !sd.strips.length) { N = n; buildSide(sd); }
-        let sumCos = 0, stack = 0;
-        sd.strips.forEach(p => { sumCos += Math.cos(p.rest * RAD); });
-        sd.s = cover / sumCos;
-        sd.strips.forEach(p => { p.el.style.width = sd.s + 'px'; stack += sd.s * Math.cos(p.max * RAD); });
-        sd.cover = cover;
-        sd.sweep = stack + 14;
-        sd.lining.style.width = cover + 'px';
-      });
-    }
-
-    function render(t, dt){
-      sides.forEach(sd => {
-        const sweep = sd.sweep * easeSweep(clamp((t - SWEEP_FROM) / (1 - SWEEP_FROM), 0, 1));
-        let hinge = 0;
-        sd.strips.forEach(p => {
-          const q = easeFold(clamp((t - p.start) / (1 - FOLD_SPREAD), 0, 1));
-          const th = p.rest + (p.max - p.rest) * q;
-          const w = sd.s * Math.cos(th * RAD);
-          p.th = th;
-          p.nc = hinge - sweep + w / 2;   // centre of the folded pleat, px from the wall
-          p.w = w;
-          hinge += w;
-        });
-        sd.lead = hinge - sweep;
-
-        // hem lag: per-pleat screen velocity, smoothed across neighbours so the hem stays continuous
-        const vs = sd.strips.map(p => (dt > 0 && p.c !== null) ? sd.dir * (p.nc - p.c) / dt / halfW : 0);
-        sd.strips.forEach((p, j) => {
-          let sum = 0, cnt = 0;
-          for (let i = j - 2; i <= j + 2; i++) if (vs[i] !== undefined) { sum += vs[i]; cnt++; }
-          if (dt > 0) {
-            const h = Math.min(dt, 0.034);
-            const target = clamp(-(sum / cnt) * SWAY_K, -SWAY_MAX, SWAY_MAX);
-            const acc = -p.k * (p.ang - target) - 7 * p.av;   // underdamped → a soft swing and settle
-            p.av += acc * h;
-            p.ang += p.av * h;
-          }
-          p.c = p.nc;
-          const sin = Math.sin(p.th * RAD);
-          const tx = sd.dir * (p.nc - sd.s / 2);
-          p.el.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,0,0) rotateY(' + (sd.dir * p.sign * p.th).toFixed(2) + 'deg) skewX(' + p.ang.toFixed(3) + 'deg)';
-          p.el.style.setProperty('--sh', ((p.sign > 0 ? .10 : .58) * sin).toFixed(3));
-          p.el.style.setProperty('--hl', ((p.sign > 0 ? .38 : 0) * sin).toFixed(3));
-        });
-
-        sd.lining.style.transform = 'scaleX(' + clamp((sd.lead - 2) / sd.cover, 0, 1).toFixed(4) + ')';
-        sd.edge.style.transform = 'translate3d(' + (sd.dir * (sd.lead - 2)).toFixed(2) + 'px,0,0)';
-        sd.edge.style.opacity = clamp(sd.lead / 80, 0, 1).toFixed(3);
-      });
-    }
-
-    layout();
-    render(0, 0);
-    window.addEventListener('resize', function onResize(){
-      if (!overlay.isConnected) { window.removeEventListener('resize', onResize); return; }
-      layout(); render(u, 0);
-    });
-
-    return {
-      play(){
-        if (reduce) { // no motion: a calm cross-fade instead
-          sides.forEach(sd => { sd.el.style.transition = 'opacity .8s ease'; sd.el.style.opacity = '0'; });
-          return;
-        }
-        let t0 = null, last = 0;
-        const frame = now => {
-          if (!overlay.isConnected) return;
-          if (t0 === null) { t0 = last = now; }
-          const dt = (now - last) / 1000; last = now;
-          u = clamp((now - t0) / PULL_MS, 0, 1);
-          render(u, dt);
-          if (u < 1) raf = requestAnimationFrame(frame);
-        };
-        raf = requestAnimationFrame(frame);
-      }
-    };
-  }
-
   function ensureHome(){
     const home=document.querySelector('#home');
     if(home){
@@ -374,7 +213,6 @@
       const startCurtain = () => {
         requestAnimationFrame(()=>requestAnimationFrame(()=>{
           overlay.classList.add('is-opening');
-          if (overlay._curtain) overlay._curtain.play();
           celebrationBurst();
         }));
       };
