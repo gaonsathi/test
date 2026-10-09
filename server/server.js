@@ -126,22 +126,43 @@ const INAUGURATE_FILE = path.join(__dirname, 'data', 'inaugurate.json');
 //         UPSTASH_REDIS_REST_TOKEN = xxxxxxxxxxxx
 //    4) Redeploy. Done — the ribbon-cutting now survives restarts.
 // ---------------------------------------------------------------------
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || '';
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+// Clean up the two env values — copy/paste mistakes are the #1 reason
+// Upstash "doesn't work": stray spaces/newlines, surrounding quotes,
+// a missing https://, a trailing slash, or "Bearer " pasted into the token.
+function cleanEnv(v) { return String(v || '').trim().replace(/^["']+|["']+$/g, '').trim(); }
+function cleanUpstashUrl(v) {
+  let u = cleanEnv(v);
+  if (!u) return '';
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  return u.replace(/\/+$/, '');
+}
+const UPSTASH_URL = cleanUpstashUrl(process.env.UPSTASH_REDIS_REST_URL);
+const UPSTASH_TOKEN = cleanEnv(process.env.UPSTASH_REDIS_REST_TOKEN).replace(/^Bearer\s+/i, '');
 const UPSTASH_KEY = 'gaonsathi_inaugurate_state';
 let warnedNoUpstash = false;
 
 async function upstashCommand(cmd) {
-  const r = await fetch(UPSTASH_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${UPSTASH_TOKEN}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(cmd)
-  });
-  if (!r.ok) throw new Error(`Upstash command failed: ${r.status}`);
+  let r;
+  try {
+    r = await fetch(UPSTASH_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${UPSTASH_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cmd)
+    });
+  } catch (e) {
+    const cause = e && e.cause && (e.cause.code || e.cause.message) ? ` (${e.cause.code || e.cause.message})` : '';
+    throw new Error(`Cannot reach Upstash at "${UPSTASH_URL}" — ${e.message}${cause}. URL galat ho sakta hai.`);
+  }
+  if (!r.ok) {
+    let detail = '';
+    try { detail = (await r.text()).slice(0, 200); } catch (e) {}
+    throw new Error(`Upstash HTTP ${r.status} ${detail}`.trim());
+  }
   const data = await r.json();
+  if (data && data.error) throw new Error(`Upstash error: ${data.error}`);
   return data.result;
 }
 
@@ -339,7 +360,7 @@ app.post('/api/schemes', requireAdmin, async (req, res) => {
   res.status(201).json(item);
   } catch (err) {
     console.error('Create scheme failed:', err.message);
-    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error) / Could not save — try again' });
+    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error): ' + err.message });
   }
 });
 
@@ -369,7 +390,7 @@ app.put('/api/schemes/:slug', requireAdmin, async (req, res) => {
   res.json(all[idx]);
   } catch (err) {
     console.error('Update scheme failed:', err.message);
-    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error) / Could not save — try again' });
+    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error): ' + err.message });
   }
 });
 
@@ -383,7 +404,7 @@ app.delete('/api/schemes/:slug', requireAdmin, async (req, res) => {
   res.json({ ok: true });
   } catch (err) {
     console.error('Delete scheme failed:', err.message);
-    res.status(500).json({ error: 'डिलीट नहीं हो पाया (storage error) / Could not delete — try again' });
+    res.status(500).json({ error: 'डिलीट नहीं हो पाया (storage error): ' + err.message });
   }
 });
 
@@ -616,8 +637,18 @@ app.get('/api/inaugurate/link', requireAdmin, async (req, res) => {
   res.json({ key: INAUGURATION_KEY, ...(await loadInaugurate()) });
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true, keyConfigured: !!GEMINI_API_KEY, model: GEMINI_MODEL, searchModel: GEMINI_SEARCH_MODEL, ttsModel: GEMINI_TTS_MODEL, ttsVoice: GEMINI_TTS_VOICE });
+// Open /api/health in the browser to see whether Upstash really works.
+app.get('/api/health', async (req, res) => {
+  let upstash = 'not configured (env vars missing)';
+  if (UPSTASH_URL && UPSTASH_TOKEN) {
+    try {
+      const pong = await upstashCommand(['PING']);
+      upstash = pong === 'PONG' ? 'OK (connected)' : `unexpected reply: ${pong}`;
+    } catch (e) {
+      upstash = 'FAILED: ' + e.message;
+    }
+  }
+  res.json({ ok: true, upstash, keyConfigured: !!GEMINI_API_KEY, model: GEMINI_MODEL, searchModel: GEMINI_SEARCH_MODEL, ttsModel: GEMINI_TTS_MODEL, ttsVoice: GEMINI_TTS_VOICE });
 });
 
 // ===================================================================
@@ -1108,7 +1139,7 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`Gaon Sathi server running → http://localhost:${PORT}`);
   console.log(`Admin panel              → http://localhost:${PORT}/admin/admin.html`);
   console.log(`Curtain WebSocket        → ws://localhost:${PORT}/curtain`);
@@ -1116,6 +1147,16 @@ server.listen(PORT, () => {
   console.log(GEMINI_API_KEY
     ? 'GEMINI_API_KEY loaded ✔'
     : '⚠ GEMINI_API_KEY missing — set it in server/.env');
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+    console.warn('⚠ Upstash env vars NOT set (UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN)');
+  } else {
+    try {
+      const pong = await upstashCommand(['PING']);
+      console.log(pong === 'PONG' ? 'Upstash connected ✔' : `⚠ Upstash odd reply: ${pong}`);
+    } catch (e) {
+      console.error('❌ Upstash connection FAILED:', e.message);
+    }
+  }
   console.log(process.env.ADMIN_PASSWORD
     ? 'ADMIN_PASSWORD loaded ✔'
     : '⚠ ADMIN_PASSWORD not set — using default password "gaonsathi123". Set your own in server/.env');
