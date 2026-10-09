@@ -191,7 +191,19 @@ async function saveInaugurate(state) {
   }
 }
 
-function loadSchemes() {
+// ---------------------------------------------------------------------
+//  SCHEMES STORAGE — Upstash Redis (same store as the inauguration flag)
+//  Render's free plan wipes local files on every restart/redeploy, so
+//  schemes added from the admin panel used to vanish and revert to
+//  whatever schemes.json is committed in git. Now the full list lives
+//  in Upstash under SCHEMES_KEY. The local file is only used:
+//    - as the one-time seed (first run, when Upstash has no list yet)
+//    - as the fallback when Upstash env vars are not set (local dev)
+// ---------------------------------------------------------------------
+const SCHEMES_KEY = 'gaonsathi_schemes';
+const upstashEnabled = () => !!(UPSTASH_URL && UPSTASH_TOKEN);
+
+function loadSchemesFromFile() {
   try {
     const raw = fs.readFileSync(SCHEMES_FILE, 'utf8');
     const data = JSON.parse(raw);
@@ -201,10 +213,52 @@ function loadSchemes() {
   }
 }
 
-function saveSchemes(list) {
-  fs.mkdirSync(path.dirname(SCHEMES_FILE), { recursive: true });
-  fs.writeFileSync(SCHEMES_FILE, JSON.stringify(list, null, 2), 'utf8');
+function saveSchemesToFile(list) {
+  try {
+    fs.mkdirSync(path.dirname(SCHEMES_FILE), { recursive: true });
+    fs.writeFileSync(SCHEMES_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('schemes.json local write failed (ok on read-only disks):', err.message);
+  }
 }
+
+// Throws if Upstash is configured but unreachable. Writers MUST use this
+// (never a silent fallback), otherwise a temporary Upstash error could
+// make a write start from the stale git copy and overwrite real data.
+async function loadSchemesStrict() {
+  if (!upstashEnabled()) return loadSchemesFromFile();
+  const raw = await upstashCommand(['GET', SCHEMES_KEY]);
+  if (raw === null || raw === undefined) {
+    // First run: Upstash has no list yet — seed it from schemes.json.
+    const seed = loadSchemesFromFile();
+    await upstashCommand(['SET', SCHEMES_KEY, JSON.stringify(seed)]);
+    console.log(`Schemes seeded into Upstash from schemes.json (${seed.length} items).`);
+    return seed;
+  }
+  const data = JSON.parse(raw);
+  return Array.isArray(data) ? data : [];
+}
+
+// Read-only paths (public site): never throw, fall back to the file.
+async function loadSchemes() {
+  try {
+    return await loadSchemesStrict();
+  } catch (err) {
+    console.error('Upstash schemes load failed, serving local file copy:', err.message);
+    return loadSchemesFromFile();
+  }
+}
+
+async function saveSchemes(list) {
+  if (upstashEnabled()) {
+    await upstashCommand(['SET', SCHEMES_KEY, JSON.stringify(list)]); // throws on failure
+  } else if (!warnedNoUpstashSchemes) {
+    warnedNoUpstashSchemes = true;
+    console.warn('⚠ Upstash env vars not set — schemes are saved only to the local file and WILL be lost on Render free-tier restarts.');
+  }
+  saveSchemesToFile(list); // local backup / local-dev storage
+}
+let warnedNoUpstashSchemes = false;
 
 function slugify(title) {
   return String(title || '')
@@ -235,15 +289,15 @@ app.post('/api/admin/login', (req, res) => {
 
 // List schemes — public gets only published ones; admin (valid key)
 // gets everything, including drafts, so the admin panel can manage them.
-app.get('/api/schemes', (req, res) => {
-  const all = loadSchemes();
+app.get('/api/schemes', async (req, res) => {
+  const all = await loadSchemes();
   const list = isAdmin(req) ? all : all.filter(s => s.published !== false);
   res.json(list);
 });
 
 // Single scheme by slug — public only sees it if published.
-app.get('/api/schemes/:slug', (req, res) => {
-  const all = loadSchemes();
+app.get('/api/schemes/:slug', async (req, res) => {
+  const all = await loadSchemes();
   const item = all.find(s => s.slug === req.params.slug);
   if (!item) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
   if (item.published === false && !isAdmin(req)) {
@@ -253,12 +307,13 @@ app.get('/api/schemes/:slug', (req, res) => {
 });
 
 // Create a new scheme article (admin only)
-app.post('/api/schemes', requireAdmin, (req, res) => {
+app.post('/api/schemes', requireAdmin, async (req, res) => {
   const body = req.body || {};
   if (!body.title || !body.title.trim()) {
     return res.status(400).json({ error: 'शीर्षक ज़रूरी है / Title is required' });
   }
-  const all = loadSchemes();
+  try {
+  const all = await loadSchemesStrict();
   // Prefer an English title for the slug when available (Hindi-only
   // titles produce an empty slug since \w only matches ASCII letters),
   // falling back to the Hindi title, then finally a timestamp so it
@@ -280,13 +335,18 @@ app.post('/api/schemes', requireAdmin, (req, res) => {
     updatedAt: now
   };
   all.unshift(item);
-  saveSchemes(all);
+  await saveSchemes(all);
   res.status(201).json(item);
+  } catch (err) {
+    console.error('Create scheme failed:', err.message);
+    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error) / Could not save — try again' });
+  }
 });
 
 // Update an existing scheme article (admin only)
-app.put('/api/schemes/:slug', requireAdmin, (req, res) => {
-  const all = loadSchemes();
+app.put('/api/schemes/:slug', requireAdmin, async (req, res) => {
+  try {
+  const all = await loadSchemesStrict();
   const idx = all.findIndex(s => s.slug === req.params.slug);
   if (idx === -1) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
 
@@ -305,17 +365,26 @@ app.put('/api/schemes/:slug', requireAdmin, (req, res) => {
     faqs: Array.isArray(body.faqs) ? body.faqs : (all[idx].faqs || []),
     updatedAt: new Date().toISOString()
   };
-  saveSchemes(all);
+  await saveSchemes(all);
   res.json(all[idx]);
+  } catch (err) {
+    console.error('Update scheme failed:', err.message);
+    res.status(500).json({ error: 'सेव नहीं हो पाया (storage error) / Could not save — try again' });
+  }
 });
 
 // Delete a scheme article (admin only)
-app.delete('/api/schemes/:slug', requireAdmin, (req, res) => {
-  const all = loadSchemes();
+app.delete('/api/schemes/:slug', requireAdmin, async (req, res) => {
+  try {
+  const all = await loadSchemesStrict();
   const next = all.filter(s => s.slug !== req.params.slug);
   if (next.length === all.length) return res.status(404).json({ error: 'योजना नहीं मिली / Scheme not found' });
-  saveSchemes(next);
+  await saveSchemes(next);
   res.json({ ok: true });
+  } catch (err) {
+    console.error('Delete scheme failed:', err.message);
+    res.status(500).json({ error: 'डिलीट नहीं हो पाया (storage error) / Could not delete — try again' });
+  }
 });
 
 function endpointFor(model) {
