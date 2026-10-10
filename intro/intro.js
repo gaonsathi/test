@@ -57,7 +57,13 @@
 
         <div class="gs-brand-left">
           <span class="gs-dev-label" data-en="Developed By">Developed By</span>
-          <b class="gs-brand-premium gs-dev-names">Ashutosh &amp; Keshav</b>
+          <b class="gs-brand-premium gs-dev-names">Ashutosh Root<span class="gs-amp">&amp;</span>Keshav Pandey</b>
+        </div>
+
+        <div class="gs-brand-right">
+          <span class="gs-dev-label" data-en="Facilitated By">Facilitated By</span>
+          <b class="gs-brand-premium gs-dev-names">D N Tiwari</b>
+          <span class="gs-role">Principal, JNV Siwan</span>
         </div>
       </div>
     `;
