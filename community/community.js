@@ -97,8 +97,8 @@
       { id: 3, name: 'पूजा कुमारी', nameEn: 'Pooja Kumari',
         avatarColor: 'var(--pink)', avatarLetter: 'पू',
         time: 'कल', timeEn: 'Yesterday',
-        text: 'गाँव साथी के "काम खोजो" सेक्शन से सिलाई का ऑर्डर मिला, अब हर महीने अपनी कमाई कर रही हूं। बहुत-बहुत धन्यवाद 🙏',
-        textEn: 'Found tailoring orders through the "Find Work" section — now earning my own income every month. Thank you so much 🙏',
+        text: 'गाँव साथी के "रोजगार" सेक्शन से सिलाई का ऑर्डर मिला, अब हर महीने अपनी कमाई कर रही हूं। बहुत-बहुत धन्यवाद 🙏',
+        textEn: 'Found tailoring orders through the "Employment" section — now earning my own income every month. Thank you so much 🙏',
         media: null, likes: 138, liked: false, open: false, comments: [] },
 
       { id: 4, name: 'सोहन महतो', nameEn: 'Sohan Mahto',
