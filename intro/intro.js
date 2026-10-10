@@ -123,7 +123,10 @@
     lockIcon.textContent='🔒';
     msg.appendChild(lockIcon);
     msg.innerHTML += `
-      <b class="gs-lock-premium">Waiting For Our Respected Principal Sir</b>
+      <b class="gs-lock-premium">Awaiting the Inauguration</b>
+      <span class="gs-lock-by">by</span>
+      <b class="gs-lock-guest">Shri H N Pandey</b>
+      <span class="gs-lock-role">Assistant Commissioner &amp; Cluster Incharge, NVS Patna Region</span>
       ${badKey ? '<em data-en="That code did not work">यह कोड सही नहीं है</em>' : ''}
     `;
     overlay.appendChild(msg);

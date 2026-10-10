@@ -242,6 +242,9 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)) drop-shadow(0 0 20px rgba(244,210,122,.4));
   animation:gs-shine 3s linear infinite;
 }
+.gs-lock-by{ display:block; margin-top:10px; font:italic 500 14px 'Playfair Display',Georgia,serif; letter-spacing:.12em; color:#f4d27a; opacity:.85; }
+.gs-lock-guest{ display:block; margin-top:4px; font:700 clamp(18px,4vw,28px)/1.25 'Playfair Display',Georgia,serif; letter-spacing:.04em; color:#fffbe6; text-shadow:0 2px 6px rgba(0,0,0,.6),0 0 16px rgba(244,210,122,.35); }
+.gs-lock-role{ display:block; margin-top:6px; font:600 clamp(12px,2.6vw,16px)/1.4 Inter,sans-serif; letter-spacing:.06em; color:#f4d27a; opacity:.92; }
 .gs-lock-msg em{ display:block; margin-top:14px; font:600 12px Inter,sans-serif; font-style:normal; color:#ffb4b4; }
 .gs-open-btn{
   margin-top:18px; padding:13px 30px; border:none; border-radius:999px;
@@ -413,6 +416,9 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
 .gs-lock-msg b{ font-size:2vw; }
 .gs-lock-msg span{ font-size:1vw; }
 .gs-lock-msg em{ font-size:1vw; }
+.gs-lock-msg .gs-lock-by{ font-size:1.1vw; }
+.gs-lock-msg .gs-lock-guest{ font-size:2vw; }
+.gs-lock-msg .gs-lock-role{ font-size:1.1vw; }
 .gs-open-btn{ font-size:1.3vw; }
 
 @media(max-width:650px){
@@ -426,6 +432,9 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   .gs-lock-msg b{ font-size:4.2vw; }
   .gs-lock-msg span{ font-size:3vw; }
   .gs-lock-msg em{ font-size:3vw; }
+  .gs-lock-msg .gs-lock-by{ font-size:3.2vw; }
+  .gs-lock-msg .gs-lock-guest{ font-size:4.6vw; }
+  .gs-lock-msg .gs-lock-role{ font-size:3vw; }
   .gs-open-btn{ font-size:4vw; }
 }
 
