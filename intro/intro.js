@@ -57,7 +57,7 @@
 
         <div class="gs-brand-left">
           <span class="gs-dev-label" data-en="Developed By">Developed By</span>
-          <b class="gs-brand-premium gs-dev-names">Ashutosh Root<span class="gs-amp">&amp;</span>Keshav Pandey</b>
+          <b class="gs-brand-premium gs-dev-names">Ashutosh Yadav<span class="gs-amp">&amp;</span>Keshav Pandey</b>
         </div>
 
         <div class="gs-brand-right">
