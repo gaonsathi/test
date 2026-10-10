@@ -7,7 +7,7 @@
 
 /* keep the sticky site header from covering the top of this section
    (its wa-header / sidebar brand) when JS scrolls #kisan into view */
-#kisan{scroll-margin-top:73px;}
+#kisan{scroll-margin-top:63px;}
 
 /* ---------- WHY KISAN SATHI — highlights band (static info, premium editorial look) ---------- */
 .kisan-highlights{
