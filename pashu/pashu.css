@@ -92,7 +92,7 @@
    are duplicated on purpose rather than reused cross-folder).
    ====================================================================== */
 #pashu [hidden]{display:none !important;}
-#pashu{scroll-margin-top:73px;}
+#pashu{scroll-margin-top:63px;}
 
 #pashu .psub-grid{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
