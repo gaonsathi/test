@@ -54,15 +54,15 @@
    without the user having to scroll. Uses svh/dvh (viewport units that
    account for mobile browser toolbars) with a plain vh fallback for older
    browsers — the later, more accurate rule simply wins where supported.
-   HEADER_H below matches the site's real header height: ~73px desktop,
-   68px on the ≤920px breakpoint where the mobile nav switches (see the
-   nav.mainnav "top:68px" rule in css/style.css).
+   HEADER_H below matches the site's real header height: ~63px desktop,
+   63px on the ≤920px breakpoint where the mobile nav switches (see the
+   nav.mainnav "top:63px" rule in css/style.css).
    ====================================================================== */
 #kaam .kh-fold {
   display: flex; flex-direction: column; justify-content: flex-start;
-  min-height: calc(100vh - 73px);
-  min-height: calc(100svh - 73px);
-  min-height: calc(100dvh - 73px);
+  min-height: calc(100vh - 63px);
+  min-height: calc(100svh - 63px);
+  min-height: calc(100dvh - 63px);
 }
 #kaam .kh-fold-inner {
   padding-top: 16px; padding-bottom: 16px;
@@ -82,9 +82,9 @@
 }
 @media (max-width: 920px) {
   #kaam .kh-fold {
-    min-height: calc(100vh - 68px);
-    min-height: calc(100svh - 68px);
-    min-height: calc(100dvh - 68px);
+    min-height: calc(100vh - 63px);
+    min-height: calc(100svh - 63px);
+    min-height: calc(100dvh - 63px);
   }
 }
 /* very short screens (small phones in landscape, split-screen windows) —
