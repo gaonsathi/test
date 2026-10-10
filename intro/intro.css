@@ -437,7 +437,7 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
    ===================================================================== */
 .gs-brand-left,
 .gs-brand-right{
-  position:absolute; top:auto; bottom:5%; transform:none;
+  position:absolute; top:auto; bottom:9%; transform:none;
   max-width:30vw; text-align:center; z-index:71;
   background:transparent; border:0; box-shadow:none; padding:0;
 }
@@ -456,7 +456,7 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   text-shadow:0 2px 5px rgba(0,0,0,.6);
 }
 @media(max-width:650px){
-  .gs-brand-left,.gs-brand-right{ bottom:4%; max-width:44vw; }
+  .gs-brand-left,.gs-brand-right{ bottom:7%; max-width:44vw; }
   .gs-brand-left{ left:3%; } .gs-brand-right{ right:3%; }
   .gs-brand-left .gs-brand-premium,
   .gs-brand-right .gs-brand-premium{ font-size:4.2vw; }
