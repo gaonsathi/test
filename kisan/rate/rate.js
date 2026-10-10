@@ -170,13 +170,15 @@
       const res = await fetch(`${AI_PROXY_BASE}/api/mandi/prices?${params.toString()}`);
       const data = await res.json().catch(() => null);
       if(!res.ok || !data){
-        throw new Error((data && data.error) || ('HTTP ' + res.status));
+        const why = (data && (data.detail || data.error)) || ('HTTP ' + res.status + (res.status === 404 || res.status === 405 ? ' (server route not found — is the latest server.js deployed?)' : ''));
+        throw new Error(why);
       }
       lastMandiPayload = data;
       renderMandiResults(data, stateLabel, commodityLabel);
     }catch(err){
       console.error('Mandi rate error:', err);
-      mandiResults.innerHTML = `<div class="rate-error">${isEn() ? 'Could not load live mandi prices. Please make sure the server is running and DATA_GOV_API_KEY is configured.' : 'लाइव मंडी भाव लोड नहीं हो पाया। कृपया server चालू रखें और DATA_GOV_API_KEY सेट करें।'} <a href="https://agmarknet.gov.in" target="_blank" rel="noopener noreferrer">${isEn()?'Open AGMARKNET':'AGMARKNET खोलें'} →</a></div>`;
+      const reason = (err && err.message) ? (/Failed to fetch|NetworkError|Load failed/i.test(err.message) ? 'cannot reach the server (' + (AI_PROXY_BASE || location.origin) + ') — it may be asleep or offline' : err.message) : '';
+      mandiResults.innerHTML = `<div class="rate-error">${isEn() ? 'Could not load live mandi prices.' : 'लाइव मंडी भाव लोड नहीं हो पाया।'}${reason ? `<br><small>${isEn() ? 'Reason' : 'कारण'}: ${escapeHtml(reason)}</small><br>` : ' '}<a href="https://agmarknet.gov.in" target="_blank" rel="noopener noreferrer">${isEn()?'Open AGMARKNET':'AGMARKNET खोलें'} →</a></div>`;
       const updated = document.getElementById('mandiUpdatedLabel'); if(updated) updated.textContent = '';
     }finally{
       setMandiBusy(false);
