@@ -546,3 +546,39 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
   .gs-lock-msg .gs-lock-role{ font-size:2.9vw; padding:6px 14px; border-radius:16px; }
   .gs-lock-msg .gs-lock-region{ font-size:3vw; letter-spacing:.2em; }
 }
+
+/* ---- v3: lower box, showier name, region on two lines ---- */
+.gs-lock-msg{ top:66%; }
+@media(max-width:650px){ .gs-lock-msg{ top:59%; } }
+.gs-lock-msg .gs-lock-guest{
+  position:relative; display:block; width:fit-content; margin:8px auto 0; padding:0 4px 12px;
+  font:800 clamp(28px,7vw,44px)/1.15 'Playfair Display',Georgia,serif; letter-spacing:.05em;
+  background:linear-gradient(100deg,#b8832a 0%,#fff3c4 25%,#ffffff 45%,#f9e28f 60%,#f4d27a 75%,#b8832a 100%);
+  background-size:250% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  text-shadow:none; filter:drop-shadow(0 3px 6px rgba(0,0,0,.65)) drop-shadow(0 0 18px rgba(244,210,122,.45));
+  animation:gs-shine 3.4s linear infinite;
+}
+.gs-lock-msg .gs-lock-guest::after{
+  content:""; position:absolute; left:8%; right:8%; bottom:0; height:2px; border-radius:2px;
+  background:linear-gradient(90deg,transparent,#f4d27a 30%,#fffbe6 50%,#f4d27a 70%,transparent);
+  box-shadow:0 0 10px rgba(244,210,122,.7);
+}
+.gs-lock-msg .gs-lock-region{ display:flex; flex-direction:column; align-items:center; gap:3px; margin-top:12px; letter-spacing:0; }
+.gs-lock-msg .gs-lock-region span{ display:block; margin:0; opacity:1; color:#f4d27a; font-family:Inter,sans-serif; text-transform:uppercase; }
+.gs-lock-msg .gs-lock-region span:first-child{ font-weight:800; letter-spacing:.5em; padding-left:.5em; font-size:clamp(14px,3.2vw,18px); }
+.gs-lock-msg .gs-lock-region span:last-child{ font-weight:600; letter-spacing:.3em; padding-left:.3em; font-size:clamp(11px,2.6vw,14px); color:#fff7e7; opacity:.9; }
+@media(min-width:651px){
+  .gs-lock-msg .gs-lock-guest{ font-size:3.2vw; }
+  .gs-lock-msg .gs-lock-region span:first-child{ font-size:1.25vw; }
+  .gs-lock-msg .gs-lock-region span:last-child{ font-size:.95vw; }
+}
+@media(max-width:650px){
+  .gs-lock-msg .gs-lock-guest{ font-size:7.6vw; }
+  .gs-lock-msg .gs-lock-region span:first-child{ font-size:3.8vw; }
+  .gs-lock-msg .gs-lock-region span:last-child{ font-size:3vw; }
+}
+
+/* ---- v4: region back to a single line "NVS, PATNA REGION" ---- */
+.gs-lock-msg .gs-lock-region{ display:block; margin-top:12px; font:600 clamp(12px,2.6vw,15px) Inter,sans-serif; letter-spacing:.28em; text-transform:uppercase; color:#f4d27a; opacity:.95; }
+@media(min-width:651px){ .gs-lock-msg .gs-lock-region{ font-size:1vw; } }
+@media(max-width:650px){ .gs-lock-msg .gs-lock-region{ font-size:3vw; letter-spacing:.2em; } }
