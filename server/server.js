@@ -583,34 +583,74 @@ const DATA_GOV_API_KEY = process.env.DATA_GOV_API_KEY || '579b464db66ec23bdd0000
 const AGMARKNET_RESOURCE_ID = '9ef84268-d588-465a-a308-a864a43d0070';
 const MSP_FILE = path.join(__dirname, 'data', 'msp.json');
 
+// data.gov.in is picky: depending on the resource, an exact-match filter
+// is accepted either as filters[state] or filters[state.keyword]. Instead
+// of guessing one spelling (which silently returned 0 records when wrong),
+// we try the known variants in order and use the first one that returns data.
+function parseArrivalDate(d) {
+  const m = String(d || '').match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+  return m ? Date.UTC(+m[3], +m[2] - 1, +m[1]) : 0;
+}
+
+async function queryAgmarknet(filters, limit, offset) {
+  const params = new URLSearchParams();
+  params.set('api-key', DATA_GOV_API_KEY);
+  params.set('format', 'json');
+  params.set('limit', String(limit));
+  params.set('offset', String(offset));
+  Object.entries(filters).forEach(([k, v]) => { if (v) params.set(k, v); });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const r = await fetch(`https://api.data.gov.in/resource/${AGMARKNET_RESOURCE_ID}?${params.toString()}`,
+      { signal: ctrl.signal, headers: { Accept: 'application/json' } });
+    const body = await r.json().catch(() => null);
+    if (!r.ok || !body) {
+      const e = new Error('upstream HTTP ' + r.status); e.status = r.status; throw e;
+    }
+    if (body.status === 'error' || (body.error && !Array.isArray(body.records))) {
+      throw new Error('upstream error: ' + (body.message || body.error));
+    }
+    return body;
+  } finally { clearTimeout(timer); }
+}
+
 app.get('/api/mandi/prices', async (req, res) => {
   try {
     const { state, district, commodity, market, variety, grade, limit, offset } = req.query || {};
-    const params = new URLSearchParams();
-    params.set('api-key', DATA_GOV_API_KEY);
-    params.set('format', 'json');
-    params.set('limit', String(Math.min(parseInt(limit, 10) || 10, 100)));
-    params.set('offset', String(Math.max(parseInt(offset, 10) || 0, 0)));
-    // Official filter syntax for this resource: filters[<field>]=<value>
-    // (NOT filters[<field>.keyword] — that was a bug in an earlier
-    // version of this file that silently matched zero records for
-    // every search, since no field is actually named "state.keyword".)
-    if (state) params.set('filters[state.keyword]', state);
-    if (district) params.set('filters[district]', district);
-    if (market) params.set('filters[market]', market);
-    if (commodity) params.set('filters[commodity]', commodity);
-    if (variety) params.set('filters[variety]', variety);
-    if (grade) params.set('filters[grade]', grade);
+    const lim = Math.min(parseInt(limit, 10) || 10, 100);
+    const off = Math.max(parseInt(offset, 10) || 0, 0);
+    const extra = {};
+    if (district) extra['filters[district]'] = district;
+    if (market) extra['filters[market]'] = market;
+    if (variety) extra['filters[variety]'] = variety;
+    if (grade) extra['filters[grade]'] = grade;
 
-    const url = `https://api.data.gov.in/resource/${AGMARKNET_RESOURCE_ID}?${params.toString()}`;
-    const r = await fetch(url);
-    if (!r.ok) {
-      return res.status(502).json({ error: 'मंडी भाव लोड नहीं हुआ / Could not load mandi price right now.', status: r.status });
+    const variants = [
+      { s: 'filters[state.keyword]', c: 'filters[commodity]' },
+      { s: 'filters[state]',         c: 'filters[commodity]' },
+      { s: 'filters[state.keyword]', c: 'filters[commodity.keyword]' }
+    ];
+    let data = null, lastErr = null;
+    for (const v of variants) {
+      const f = { ...extra };
+      if (state) f[v.s] = state;
+      if (commodity) f[v.c] = commodity;
+      try {
+        const d = await queryAgmarknet(f, lim, off);
+        if (Array.isArray(d.records) && d.records.length) { data = d; break; }
+        if (!data) data = d; // keep the (empty) answer in case nothing matches
+      } catch (e) { lastErr = e; }
     }
-    const data = await r.json();
+    if (!data) {
+      console.error('mandi price proxy error:', lastErr);
+      return res.status(502).json({ error: 'मंडी भाव लोड नहीं हुआ / Could not load mandi price right now.', detail: lastErr && lastErr.message });
+    }
+    const records = (Array.isArray(data.records) ? data.records : [])
+      .sort((a, b) => parseArrivalDate(b.arrival_date) - parseArrivalDate(a.arrival_date)); // newest first
     res.json({
-      records: Array.isArray(data.records) ? data.records : [],
-      total: data.total || (data.records || []).length,
+      records,
+      total: data.total || records.length,
       source: 'AGMARKNET (agmarknet.gov.in) via data.gov.in — Ministry of Agriculture & Farmers Welfare, Govt of India',
       sourceUrl: 'https://agmarknet.gov.in',
       fetchedAt: new Date().toISOString(),
