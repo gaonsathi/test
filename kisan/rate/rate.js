@@ -67,8 +67,8 @@
   const COMMODITIES = [
     {en:'Wheat', hi:'गेहूं'}, {en:'Rice', hi:'चावल'}, {en:'Paddy(Dhan)(Common)', hi:'धान (सामान्य)'},
     {en:'Maize', hi:'मक्का'}, {en:'Bajra(Pearl Millet/Cumbu)', hi:'बाजरा'}, {en:'Jowar(Sorghum)', hi:'ज्वार'},
-    {en:'Gram Raw(Chholia)', hi:'चना'}, {en:'Arhar (Tur/Red Gram)(Whole)', hi:'तूर/अरहर'},
-    {en:'Moong(Green Gram)(Whole)', hi:'मूंग'}, {en:'Urad', hi:'उड़द'}, {en:'Masur Dal', hi:'मसूर'},
+    {en:'Bengal Gram(Gram)(Whole)', hi:'चना'}, {en:'Arhar (Tur/Red Gram)(Whole)', hi:'तूर/अरहर'},
+    {en:'Green Gram (Moong)(Whole)', hi:'मूंग'}, {en:'Black Gram (Urd Beans)(Whole)', hi:'उड़द'}, {en:'Lentil (Masur)(Whole)', hi:'मसूर'},
     {en:'Groundnut', hi:'मूंगफली'}, {en:'Mustard', hi:'सरसों'}, {en:'Soyabean', hi:'सोयाबीन'},
     {en:'Sunflower', hi:'सूरजमुखी'}, {en:'Sesamum(Sesame,Gingelly,Til)', hi:'तिल'},
     {en:'Cotton', hi:'कपास'}, {en:'Sugarcane', hi:'गन्ना'}, {en:'Potato', hi:'आलू'},
