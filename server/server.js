@@ -606,12 +606,17 @@ async function queryAgmarknet(filters, limit, offset) {
       { signal: ctrl.signal, headers: { Accept: 'application/json' } });
     const body = await r.json().catch(() => null);
     if (!r.ok || !body) {
-      const e = new Error('upstream HTTP ' + r.status); e.status = r.status; throw e;
+      const e = new Error('data.gov.in HTTP ' + r.status + (body && (body.message || body.error) ? ' — ' + (body.message || body.error) : ''));
+      e.status = r.status; throw e;
     }
     if (body.status === 'error' || (body.error && !Array.isArray(body.records))) {
       throw new Error('upstream error: ' + (body.message || body.error));
     }
     return body;
+  } catch (e) {
+    if (e && e.name === 'AbortError') throw new Error('data.gov.in did not answer within 15 seconds (timeout)');
+    if (e && e.cause) throw new Error('could not reach data.gov.in: ' + (e.cause.code || e.cause.message));
+    throw e;
   } finally { clearTimeout(timer); }
 }
 
