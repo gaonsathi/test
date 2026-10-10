@@ -438,27 +438,29 @@ html.gs-intro-lock,html.gs-intro-lock body{overflow:hidden!important;height:100%
 .gs-brand-left,
 .gs-brand-right{
   position:absolute; top:auto; bottom:9%; transform:none;
-  max-width:30vw; text-align:center; z-index:71;
+  max-width:34vw; text-align:center; z-index:71;
   background:transparent; border:0; box-shadow:none; padding:0;
 }
 .gs-brand-left{ left:3.2%; right:auto; }
 .gs-brand-right{ right:3.2%; left:auto; }
 .gs-brand-left .gs-brand-premium,
 .gs-brand-right .gs-brand-premium{
-  font-size:2vw; line-height:1.2; letter-spacing:.03em; text-align:center;
+  font-size:2.6vw; line-height:1.2; letter-spacing:.03em; text-align:center;
 }
 .gs-dev-names .gs-amp{
   display:block; font-size:.6em; line-height:1.1; letter-spacing:0;
 }
 .gs-role{
-  display:block; margin-top:6px; font:700 1vw 'Baloo 2','Mukta',sans-serif;
+  display:block; margin-top:6px; font:700 1.3vw 'Baloo 2','Mukta',sans-serif;
   letter-spacing:.14em; text-transform:uppercase; color:var(--gold2);
   text-shadow:0 2px 5px rgba(0,0,0,.6);
 }
 @media(max-width:650px){
-  .gs-brand-left,.gs-brand-right{ bottom:7%; max-width:44vw; }
+  .gs-brand-left,.gs-brand-right{ bottom:7%; max-width:46vw; }
   .gs-brand-left{ left:3%; } .gs-brand-right{ right:3%; }
   .gs-brand-left .gs-brand-premium,
-  .gs-brand-right .gs-brand-premium{ font-size:4.2vw; }
-  .gs-role{ font-size:2.4vw; }
+  .gs-brand-right .gs-brand-premium{ font-size:5vw; }
+  .gs-role{ font-size:2.8vw; }
 }
+.gs-brand-left .gs-dev-label,.gs-brand-right .gs-dev-label{ font-size:1.1vw; }
+@media(max-width:650px){ .gs-brand-left .gs-dev-label,.gs-brand-right .gs-dev-label{ font-size:2.8vw; } }
