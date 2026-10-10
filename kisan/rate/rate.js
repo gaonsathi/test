@@ -150,6 +150,42 @@
     if(updated) updated.textContent = latest ? `${isEn()?'Latest report':'अंतिम रिपोर्ट'}: ${latest}` : `${records.length} ${isEn()?'mandis':'मंडियां'}`;
   }
 
+  // ---- direct browser call to data.gov.in (fallback when our server can't reach it) ----
+  const DIRECT_RESOURCE = '9ef84268-d588-465a-a308-a864a43d0070';
+  const DIRECT_KEY = window.DATA_GOV_API_KEY || '579b464db66ec23bdd000001cdd3946e44ce4aad7209ff7b23ac571b';
+  function parseArrival(d){
+    const m = String(d || '').match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    return m ? Date.UTC(+m[3], +m[2]-1, +m[1]) : 0;
+  }
+  async function fetchMandiDirect(state, commodity){
+    const variants = [
+      { s:'filters[state.keyword]', c:'filters[commodity]' },
+      { s:'filters[state]',         c:'filters[commodity]' }
+    ];
+    let last = null, empty = null;
+    for(const v of variants){
+      const p = new URLSearchParams({ 'api-key': DIRECT_KEY, format:'json', limit:'10', offset:'0' });
+      p.set(v.s, state); p.set(v.c, commodity);
+      const ctrl = new AbortController();
+      const t = setTimeout(()=>ctrl.abort(), 15000);
+      try{
+        const r = await fetch(`https://api.data.gov.in/resource/${DIRECT_RESOURCE}?${p.toString()}`, { signal: ctrl.signal });
+        if(!r.ok) throw new Error('data.gov.in HTTP ' + r.status);
+        const body = await r.json();
+        const recs = Array.isArray(body.records) ? body.records : [];
+        if(recs.length){
+          recs.sort((a,b)=> parseArrival(b.arrival_date) - parseArrival(a.arrival_date));
+          return { records: recs, total: body.total || recs.length, usingSampleKey: !window.DATA_GOV_API_KEY };
+        }
+        empty = { records: [], total: 0, usingSampleKey: !window.DATA_GOV_API_KEY };
+      }catch(e){
+        last = (e && e.name === 'AbortError') ? new Error('timeout') : e;
+      }finally{ clearTimeout(t); }
+    }
+    if(empty) return empty;
+    throw last || new Error('no response');
+  }
+
   async function fetchMandiPrices(){
     if(!mandiStateSelect || !mandiCommoditySelect) return;
     const state = mandiStateSelect.value;
@@ -166,12 +202,25 @@
       </div>`;
 
     try{
-      const params = new URLSearchParams({ state, commodity, limit: '10', offset: '0' });
-      const res = await fetch(`${AI_PROXY_BASE}/api/mandi/prices?${params.toString()}`);
-      const data = await res.json().catch(() => null);
-      if(!res.ok || !data){
-        const why = (data && (data.detail || data.error)) || ('HTTP ' + res.status + (res.status === 404 || res.status === 405 ? ' (server route not found — is the latest server.js deployed?)' : ''));
-        throw new Error(why);
+      let data;
+      try{
+        // 1st choice: our own server (keeps a private API key off the browser)
+        const params = new URLSearchParams({ state, commodity, limit: '10', offset: '0' });
+        const res = await fetch(`${AI_PROXY_BASE}/api/mandi/prices?${params.toString()}`);
+        data = await res.json().catch(() => null);
+        if(!res.ok || !data){
+          throw new Error((data && (data.detail || data.error)) || ('HTTP ' + res.status + (res.status === 404 || res.status === 405 ? ' (server route not found — is the latest server.js deployed?)' : '')));
+        }
+      }catch(serverErr){
+        // 2nd choice: ask data.gov.in straight from the visitor's browser.
+        // Needed because some cloud hosts (e.g. Render) are refused by
+        // data.gov.in (ECONNREFUSED), while visitors in India are not.
+        console.warn('Mandi server route failed, trying data.gov.in directly:', serverErr);
+        try{
+          data = await fetchMandiDirect(state, commodity);
+        }catch(directErr){
+          throw new Error(serverErr.message + ' | direct: ' + directErr.message);
+        }
       }
       lastMandiPayload = data;
       renderMandiResults(data, stateLabel, commodityLabel);
