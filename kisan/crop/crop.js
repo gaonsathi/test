@@ -46,8 +46,10 @@
   //      never just silently does nothing.
   // =========================================================
   let activeTTSAudio = null; // currently-playing Gemini TTS <audio>, if any
+  let activeTTSToken = null; // identifies the current speech run so stop/new-speech can cancel it
 
   function stopAllSpeech(){
+    activeTTSToken = null;
     if(activeTTSAudio){
       try{ activeTTSAudio.pause(); }catch(e){}
       activeTTSAudio = null;
@@ -55,30 +57,73 @@
     if('speechSynthesis' in window) window.speechSynthesis.cancel();
   }
 
-  // Fetches real Gemini speech audio for `text` and plays it. Calls
-  // onStart when playback begins and onEnd when it finishes (either
-  // naturally or via stopAllSpeech()). Resolves true if Gemini audio
-  // played, false if the caller should fall back to browser speech.
+  // Splits text into small pieces (first piece is short on purpose) so the
+  // FIRST audio can be generated and start playing almost immediately,
+  // while the remaining pieces are generated in the background.
+  function splitForTTS(text){
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    const sentences = clean.match(/[^.!?।\n]+[.!?।]?/g) || [clean];
+    const chunks = [];
+    let cur = '';
+    sentences.forEach(sn => {
+      sn = sn.trim();
+      if(!sn) return;
+      const limit = chunks.length === 0 ? 90 : 260; // short first chunk = fast start
+      if(cur && (cur + ' ' + sn).length > limit){ chunks.push(cur); cur = sn; }
+      else cur = cur ? cur + ' ' + sn : sn;
+      if(chunks.length === 0 && cur.length >= 40){ chunks.push(cur); cur = ''; }
+    });
+    if(cur) chunks.push(cur);
+    return chunks;
+  }
+
+  function fetchTTSBlob(text){
+    return fetch(`${AI_PROXY_BASE}/api/gemini/tts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    }).then(res => res.ok ? res.blob() : null).catch(() => null);
+  }
+
+  // Plays real Gemini speech for `text`, chunk by chunk. All chunks are
+  // requested at the same time; playback starts as soon as chunk 1 is
+  // ready. Resolves true if audio played, false if the caller should
+  // fall back to browser speech.
   async function speakWithGemini(text, onStart, onEnd){
-    try{
-      const res = await fetch(`${AI_PROXY_BASE}/api/gemini/tts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      });
-      if(!res.ok) return false;
-      const blob = await res.blob();
+    const chunks = splitForTTS(text);
+    if(!chunks.length) return false;
+    const token = {};
+    activeTTSToken = token;
+    const jobs = chunks.map(fetchTTSBlob); // parallel requests
+
+    const first = await jobs[0];
+    if(activeTTSToken !== token) return true; // user stopped / new speech started
+    if(!first) return false;
+
+    let started = false;
+    const finish = () => { if(activeTTSToken === token){ activeTTSToken = null; activeTTSAudio = null; } if(onEnd) onEnd(); };
+
+    const playBlob = blob => new Promise(resolve => {
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       activeTTSAudio = audio;
-      audio.onended = () => { URL.revokeObjectURL(url); if(activeTTSAudio === audio) activeTTSAudio = null; if(onEnd) onEnd(); };
-      audio.onerror = () => { URL.revokeObjectURL(url); if(activeTTSAudio === audio) activeTTSAudio = null; if(onEnd) onEnd(); };
-      if(onStart) onStart();
-      await audio.play();
-      return true;
-    }catch(e){
-      return false;
+      const done = ok => { URL.revokeObjectURL(url); resolve(ok); };
+      audio.onended = () => done(true);
+      audio.onerror = () => done(false);
+      audio.play().then(() => { if(!started){ started = true; if(onStart) onStart(); } }).catch(() => done(false));
+    });
+
+    const ok = await playBlob(first);
+    if(!ok && !started) return false;
+    for(let i = 1; i < jobs.length; i++){
+      if(activeTTSToken !== token) return true;
+      const blob = await jobs[i];
+      if(activeTTSToken !== token) return true;
+      if(!blob) continue;
+      await playBlob(blob);
     }
+    if(activeTTSToken === token) finish();
+    return true;
   }
 
   function speakText(text, btn, lang){
