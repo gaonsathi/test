@@ -109,22 +109,31 @@
   let SCHEMES = [];
   let loadState = 'loading'; // 'loading' | 'ready' | 'error'
 
+  // Built-in (static) schemes ship with the site (yojna/schemes-data-*.js),
+  // so the page works instantly even when the free Render server is
+  // asleep or offline. Admin-added schemes from the API are merged in
+  // when/if the server answers; a static scheme with the same slug wins.
+  function staticCards() {
+    return (window.GS_STATIC_SCHEMES || []).filter(a => a.published !== false).map(adminItemToCard);
+  }
+
   async function loadAdminSchemes() {
-    loadState = 'loading';
-    render();
+    const base = staticCards();
+    SCHEMES = base;
+    loadState = 'ready';
+    render(); // show static schemes immediately — no skeleton, no waiting
     try {
       const AI_PROXY_BASE = window.GAON_SATHI_API_BASE || "";
       const res = await fetch(`${AI_PROXY_BASE}/api/schemes`);
       if (!res.ok) throw new Error('bad response');
       const items = await res.json();
-      SCHEMES = Array.isArray(items) ? items.map(adminItemToCard) : [];
-      loadState = 'ready';
+      if (!Array.isArray(items)) return;
+      const have = new Set(base.map(c => c.articleSlug));
+      const extra = items.filter(a => a.slug && !have.has(a.slug)).map(adminItemToCard);
+      if (extra.length) { SCHEMES = base.concat(extra); render(); }
     } catch (err) {
-      // Gaon Sathi server isn't running / unreachable.
-      SCHEMES = [];
-      loadState = 'error';
+      // Server asleep/unreachable — static schemes are already showing, nothing to do.
     }
-    render();
   }
 
   // ------------------------------------------------------------------
@@ -186,6 +195,9 @@
     return activeChip ? activeChip.dataset.tag : 'all';
   }
 
+  // Farmer schemes first (this site's main audience), then new launches, then the rest.
+  function rank(x) { return (x.tag === 'farmer' ? 2 : 0) + (x.isNew ? 1 : 0); }
+
   function filteredSchemes() {
     const tag = activeTag();
     const en = isEnglish();
@@ -202,7 +214,7 @@
       })
       // "🆕 नई सबसे पहले" — new-launch schemes float to the top, otherwise
       // keep the curated order above.
-      .sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+      .sort((a, b) => rank(b) - rank(a));
   }
 
   function render() {
