@@ -400,8 +400,16 @@
     if (!holder) return;
     try {
       if (!allSchemesCache) {
-        const res = await fetch('/api/schemes');
-        allSchemesCache = res.ok ? await res.json() : [];
+        const stat = (window.GS_STATIC_SCHEMES || []).filter(x => x.published !== false);
+        allSchemesCache = stat.slice();
+        if (stat.filter(s => s.slug !== a.slug && s.tag === a.tag).length < 3) {
+          try {
+            const res = await fetch('/api/schemes');
+            const extra = res.ok ? await res.json() : [];
+            const have = new Set(stat.map(x => x.slug));
+            allSchemesCache = stat.concat(extra.filter(x => !have.has(x.slug)));
+          } catch (e) { /* server asleep — static list is enough */ }
+        }
       }
       const related = allSchemesCache
         .filter(s => s.slug !== a.slug && s.tag === a.tag)
@@ -441,6 +449,9 @@
         : 'कोई योजना नहीं चुनी गई। <a href="../index.html#yojna">← सभी योजनाओं पर जाएं</a>'}</p>`;
       return;
     }
+    // Built-in schemes first — instant, works without the server.
+    const builtIn = (window.GS_STATIC_SCHEMES || []).find(x => x.slug === slug && x.published !== false);
+    if (builtIn) { currentArticle = builtIn; render(); return; }
     try {
       const res = await fetch(`/api/schemes/${encodeURIComponent(slug)}`);
       if (!res.ok) throw new Error('not found');
