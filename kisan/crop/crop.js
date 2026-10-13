@@ -50,6 +50,7 @@
 
   function stopAllSpeech(){
     activeTTSToken = null;
+    if(typeof spkCancel === 'function') spkCancel();
     if(activeTTSAudio){
       try{ activeTTSAudio.pause(); }catch(e){}
       activeTTSAudio = null;
@@ -126,24 +127,166 @@
     return true;
   }
 
+  // =========================================================
+  //  REAL-TIME READ-ALOUD (same Live voice as the mic mode)
+  //  A small WebSocket to /live in "speak" mode. The page sends the
+  //  reply text, and the Live model streams voice back chunk by chunk,
+  //  so speech starts almost instantly. spkWarmup() is called while
+  //  the AI is still thinking, so the connection is already open the
+  //  moment the reply is ready. If anything fails, speakText() falls
+  //  back to the chunked Gemini TTS, then to browser speech.
+  // =========================================================
+  let spkSocket = null, spkReady = false, spkWaiters = [], spkRun = null, spkWarmTimer = null;
+  let spkCtx = null, spkNext = 0, spkSources = [];
+
+  function spkUrl(){
+    const base = window.GAON_SATHI_LIVE_BASE || AI_PROXY_BASE;
+    return base.replace(/^http/, 'ws') + '/live';
+  }
+  function spkEnsureCtx(){
+    try{
+      if(!spkCtx) spkCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if(spkCtx.state === 'suspended') spkCtx.resume();
+    }catch(e){}
+  }
+  function spkStopPlayback(){
+    spkSources.forEach(s => { try{ s.stop(); }catch(e){} });
+    spkSources = [];
+    if(spkCtx) spkNext = spkCtx.currentTime;
+  }
+  function spkCloseSocket(){
+    clearTimeout(spkWarmTimer);
+    const ws = spkSocket;
+    spkSocket = null; spkReady = false; spkWaiters = [];
+    if(ws){ try{ ws.onclose = ws.onerror = ws.onmessage = null; ws.close(); }catch(e){} }
+  }
+  function spkPlayChunk(b64, mime){
+    if(!spkCtx) spkEnsureCtx();
+    if(!spkCtx) return;
+    const m = /rate=(\d+)/.exec(mime || '');
+    const rate = m ? parseInt(m[1], 10) : 24000;
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const pcm = new Int16Array(bytes.buffer, 0, Math.floor(bytes.byteLength / 2));
+    const f32 = new Float32Array(pcm.length);
+    for(let i = 0; i < pcm.length; i++) f32[i] = pcm[i] / 32768;
+    const buf = spkCtx.createBuffer(1, f32.length, rate);
+    buf.copyToChannel(f32, 0);
+    const src = spkCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(spkCtx.destination);
+    const now = spkCtx.currentTime;
+    if(spkNext < now) spkNext = now + 0.03;
+    src.start(spkNext);
+    spkNext += buf.duration;
+    spkSources.push(src);
+    src.onended = () => { spkSources = spkSources.filter(x => x !== src); };
+  }
+
+  // Open (or keep) the connection ahead of time. Safe to call often.
+  function spkWarmup(){
+    spkEnsureCtx();
+    if(spkSocket && spkSocket.readyState <= 1) return;
+    let ws;
+    try{ ws = new WebSocket(spkUrl()); }catch(e){ return; }
+    spkSocket = ws; spkReady = false;
+    ws.onopen = () => { try{ ws.send(JSON.stringify({ type:'start', mode:'speak' })); }catch(e){} };
+    ws.onmessage = (ev) => {
+      let msg; try{ msg = JSON.parse(ev.data); }catch(e){ return; }
+      if(msg.type === 'ready'){
+        spkReady = true;
+        const w = spkWaiters; spkWaiters = [];
+        w.forEach(fn => fn());
+      } else if(msg.type === 'audio'){
+        if(spkRun) spkRun.onAudio(msg.data, msg.mimeType);
+      } else if(msg.type === 'turnComplete'){
+        if(spkRun) spkRun.onTurnComplete();
+      } else if(msg.type === 'error'){
+        if(spkRun) spkRun.fail();
+      }
+    };
+    const dead = () => {
+      if(spkSocket !== ws) return;
+      spkSocket = null; spkReady = false; spkWaiters = [];
+      if(spkRun) spkRun.fail();
+    };
+    ws.onerror = dead;
+    ws.onclose = dead;
+    clearTimeout(spkWarmTimer);
+    spkWarmTimer = setTimeout(() => { if(!spkRun) spkCloseSocket(); }, 45000); // unused warm socket
+  }
+
+  function spkCancel(){
+    if(spkRun) spkRun.cancel();
+    else { spkStopPlayback(); }
+  }
+
+  // Resolves true if live voice handled it (played or was cancelled),
+  // false if nothing played so the caller should use the fallback.
+  function spkSpeak(text, onStart, onEnd){
+    return new Promise(resolve => {
+      if(spkRun) spkRun.cancel();
+      spkStopPlayback();
+      const run = {
+        played: false, done: false, timer: null,
+        finish(ok){
+          if(run.done) return;
+          run.done = true;
+          clearTimeout(run.timer);
+          if(spkRun === run) spkRun = null;
+          spkCloseSocket();
+          if(run.played && onEnd) onEnd();
+          resolve(ok);
+        },
+        onAudio(data, mime){
+          if(run.done) return;
+          if(!run.played){ run.played = true; clearTimeout(run.timer); if(onStart) onStart(); }
+          spkPlayChunk(data, mime);
+        },
+        onTurnComplete(){
+          if(run.done) return;
+          const wait = spkCtx ? Math.max(0, spkNext - spkCtx.currentTime) : 0;
+          setTimeout(() => run.finish(true), wait * 1000 + 120);
+        },
+        fail(){ run.finish(run.played); },
+        cancel(){ spkStopPlayback(); run.finish(true); }
+      };
+      spkRun = run;
+      // no audio within 9s → give up and let the fallback speak
+      run.timer = setTimeout(() => run.finish(run.played), 9000);
+
+      const send = () => {
+        if(run.done || !spkSocket || spkSocket.readyState !== 1) return;
+        try{ spkSocket.send(JSON.stringify({ type:'text', text })); }catch(e){ run.fail(); }
+      };
+      spkEnsureCtx();
+      if(!spkSocket || spkSocket.readyState > 1) spkWarmup();
+      if(spkReady) send(); else spkWaiters.push(send);
+    });
+  }
+
   function speakText(text, btn, lang){
     if(!text) return;
     stopAllSpeech();
     const start = () => { if(btn) btn.classList.add('speaking'); };
     const end = () => { if(btn) btn.classList.remove('speaking'); };
-    speakWithGemini(text, start, end).then(played => {
-      if(played) return;
-      // fallback — browser's built-in voice
-      if(!('speechSynthesis' in window)) return;
-      try{
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = (lang || (isEn() ? 'en' : 'hi')) === 'en' ? 'en-IN' : 'hi-IN';
-        utter.rate = 0.95;
-        utter.onstart = start;
-        utter.onend = end;
-        utter.onerror = end;
-        window.speechSynthesis.speak(utter);
-      }catch(e){ /* speech not available, ignore silently */ }
+    // 1) real-time Live voice  2) chunked Gemini TTS  3) browser voice
+    spkSpeak(text, start, end).then(handled => {
+      if(handled) return;
+      return speakWithGemini(text, start, end).then(played => {
+        if(played) return;
+        if(!('speechSynthesis' in window)) return;
+        try{
+          const utter = new SpeechSynthesisUtterance(text);
+          utter.lang = (lang || (isEn() ? 'en' : 'hi')) === 'en' ? 'en-IN' : 'hi-IN';
+          utter.rate = 0.95;
+          utter.onstart = start;
+          utter.onend = end;
+          utter.onerror = end;
+          window.speechSynthesis.speak(utter);
+        }catch(e){ /* speech not available, ignore silently */ }
+      });
     });
   }
 
@@ -615,6 +758,7 @@
       return;
     }
     if(chatBusy) return;
+    spkWarmup(); // open the live voice connection while the photo is being analysed
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
@@ -864,6 +1008,7 @@ ${searchBlock}
     const qLangFallback = detectLangFromText(question);
 
     hideInlineError();
+    if(viaVoice) spkWarmup();
     addUserTextBubble(question);
     setComposerBusy(true);
     const typingRow = addTypingBubble();
