@@ -796,6 +796,7 @@ app.post('/api/gemini/tts', async (req, res) => {
 //    { type: "start", context: "<text summary of the chat so far>" }
 //    { type: "audio", data: "<base64 PCM16 16kHz mono>" }
 //    { type: "audioStreamEnd" }   — mic paused/muted
+//    { type: "start", mode: "speak" } + { type: "text", text } — read this text aloud (no mic)
 //    { type: "end" }              — farmer closed Live Voice
 //
 //  Server → client messages (to crop.js):
@@ -817,6 +818,11 @@ const LIVE_VOICE_PERSONA = `आप "फसल साथी" हैं — भा
 - हर जवाब 2 से 4 वाक्यों में दें, बहुत लंबा जवाब मत दीजिए — यह बोलचाल है, भाषण नहीं।
 - अगर किसान बीच में बोलना शुरू करे, तुरंत रुक जाएं और उसे सुनें।
 - Apni identity (ki aapko Ashutosh aur Keshav ne develop kiya hai) sirf tab tak seedha mat batao jab tak zaroorat na ho — lekin jab bhi situation khud ban jaaye (seedha poochhe, tareef kare, developer/credit se juda sawaal ho, ya baat naturally us taraf mude) to khud judge karke, apne alfaazon mein, halke Hinglish mein bata do ki Ashutosh aur Keshav ne aapko develop kiya hai. Agar sawaal kheti se hatke, out-of-topic/general ho (jaise "tum kaun ho") to "develop" ki jagah "train" word use karke, crop/kheti ke context ke saath bata do ki Ashutosh aur Keshav ne aapko crop ke liye train kiya hai. Yeh koi fixed, rata-rataya vaakya nahi honi chahiye — har baar situation ke hisaab se apna naya, sahaj vaakya banaiye, jaise ek insaan apne mind se bolta hai, kisi script se padh kar nahi. Bina wajah har jawaab mein yeh mat thoonsiye, sirf jab context sach mein banta ho.`;
+
+// "Speak" mode: same low-latency Live voice, but it only READS OUT text
+// the page sends (photo analysis, chat replies) — streamed audio starts
+// within a moment instead of waiting for a full TTS file.
+const LIVE_READER_PERSONA = `You are a voice reader. Every message you receive is a text that must be read aloud, nothing else. Read it word for word, in the same language it is written in (Hindi, English, Bhojpuri or Bengali), in a warm, clear, natural and friendly tone at a calm pace. Do not answer it, do not add greetings, comments or explanations, do not skip or summarise anything, and do not say any emoji. Just read the text aloud.`;
 
 function liveUpstreamUrl(){
   return `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(GEMINI_API_KEY)}`;
@@ -852,10 +858,11 @@ function handleLiveConnection(clientWs){
 
     if (msg.type === 'start') {
       if (upstream) return; // already started
+      const speakMode = msg.mode === 'speak';
       upstream = new WebSocket(liveUpstreamUrl());
 
       upstream.on('open', () => {
-        const systemText = msg.context
+        const systemText = speakMode ? LIVE_READER_PERSONA : msg.context
           ? `${LIVE_VOICE_PERSONA}\n\nअब तक की बातचीत/फसल की जानकारी (ध्यान में रखें):\n${msg.context}`
           : LIVE_VOICE_PERSONA;
         const setupMessage = {
@@ -870,7 +877,7 @@ function handleLiveConnection(clientWs){
               speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: GEMINI_TTS_VOICE } } }
             },
             systemInstruction: { parts: [{ text: systemText }] },
-            inputAudioTranscription: {},
+            ...(speakMode ? {} : { inputAudioTranscription: {} }),
             outputAudioTranscription: {},
             // Without this, Gemini uses its default voice-activity-detection
             // (VAD) sensitivity, which is tuned for quiet, close-mic
@@ -959,6 +966,9 @@ function handleLiveConnection(clientWs){
 
     if (msg.type === 'audio' && msg.data) {
       upstream.send(JSON.stringify({ realtimeInput: { audio: { data: msg.data, mimeType: 'audio/pcm;rate=16000' } } }));
+    } else if (msg.type === 'text' && msg.text) {
+      // speak mode: hand the text to the Live model to read aloud
+      upstream.send(JSON.stringify({ realtimeInput: { text: String(msg.text).slice(0, 4000) } }));
     } else if (msg.type === 'audioStreamEnd') {
       upstream.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
     } else if (msg.type === 'end') {
