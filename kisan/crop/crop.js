@@ -1320,8 +1320,7 @@ ${searchBlock}
           lvPendingAudioQueue.forEach(b64 => lvSocket.send(JSON.stringify({ type:'audio', data: b64 })));
         }
         lvPendingAudioQueue = [];
-        lvSetState('listening');
-        lvSetStatus('सुन रही हूँ... बोलिए 👂', 'Listening... go ahead 👂');
+        lvShowListeningIfReady();
       } else if(msg.type === 'inputTranscript'){
         lvInputCaptionText = msg.text;
         if(!lvTurnActive && lvCaption) lvCaption.textContent = lvInputCaptionText;
@@ -1506,13 +1505,20 @@ ${searchBlock}
     lvMicProcessor.connect(silentGain);
     silentGain.connect(lvMicCtx.destination);
     lvMicSending = true;
-    // Mic is capturing now — reflect that immediately even though the
-    // server round trip may still be in flight, so the UI feels
-    // instant rather than waiting on the network.
-    if(lvSessionOpen){
-      lvSetState('listening');
-      lvSetStatus('सुन रही हूँ... बोलिए 👂', 'Listening... go ahead 👂');
-    }
+    // The mic is capturing, but Gemini may not be connected yet (cold
+    // server / slow handshake can take several seconds). Only show
+    // "सुन रही हूँ... बोलिए" once BOTH are really ready — otherwise the
+    // farmer starts talking while nobody is listening yet.
+    lvShowListeningIfReady();
+  }
+
+  // Shows "Listening… go ahead" only when the mic is capturing AND the
+  // Gemini session is up. Called from both sides; whichever finishes
+  // last flips the UI.
+  function lvShowListeningIfReady(){
+    if(!lvSessionOpen || !lvUpstreamReady || !lvMicSending || lvTurnActive) return;
+    lvSetState('listening');
+    lvSetStatus('सुन रही हूँ... बोलिए 👂', 'Listening... go ahead 👂');
   }
 
   function lvStopMic(silent){
@@ -1659,5 +1665,9 @@ ${searchBlock}
       entries.forEach(en => { if(!en.isIntersecting) stopVoiceOnLeave(); });
     }).observe(chatThread);
   }
+
+  // Wake the server up as soon as the chat opens (free hosting sleeps when
+  // idle and takes several seconds to start), so the mic connects faster.
+  try{ fetch(`${AI_PROXY_BASE}/api/health`, { cache:'no-store' }).catch(()=>{}); }catch(e){}
 
 })();
