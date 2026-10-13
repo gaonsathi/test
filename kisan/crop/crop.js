@@ -1638,4 +1638,26 @@ ${searchBlock}
     });
   }
 
+  // =========================================================
+  //  LEAVING THE CHAT → STOP ALL VOICE IMMEDIATELY
+  //  Covers: the back buttons, browser back, switching to another
+  //  tool/section (chat gets hidden), switching tabs/apps, and
+  //  closing or reloading the page.
+  // =========================================================
+  function stopVoiceOnLeave(){
+    stopAllSpeech();
+    if(typeof lvSessionOpen !== 'undefined' && lvSessionOpen) closeLiveVoice();
+  }
+  document.addEventListener('click', (e) => {
+    if(e.target.closest && e.target.closest('[data-ksub-back]')) stopVoiceOnLeave();
+  }, true);
+  window.addEventListener('popstate', stopVoiceOnLeave);
+  window.addEventListener('pagehide', stopVoiceOnLeave);
+  document.addEventListener('visibilitychange', () => { if(document.hidden) stopVoiceOnLeave(); });
+  if(chatThread && 'IntersectionObserver' in window){
+    new IntersectionObserver((entries) => {
+      entries.forEach(en => { if(!en.isIntersecting) stopVoiceOnLeave(); });
+    }).observe(chatThread);
+  }
+
 })();
