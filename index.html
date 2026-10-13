@@ -117,10 +117,11 @@
     // section's script simply does nothing instead of erroring.
     // (A new section-only script? Just add its path to this list.
     //  ⚠️ Do not write #kaam logic here — it belongs in kaam/kaam.js)
-    const scripts = ['js/script.js', 'kisan/kisan.js', 'kisan/weather/weather.js', 'kaam/kaam.js', 'pashu/pashu.js', 'yojna/yojna.js', 'community/community.js', 'js/fx.js'];
+    const scripts = ['js/script.js', 'kisan/kisan.js', 'kisan/weather/weather.js', 'kaam/kaam.js', 'pashu/pashu.js', 'yojna/schemes-data-farmer.js', 'yojna/schemes-data-people.js', 'yojna/schemes-data-life.js', 'yojna/yojna.js', 'community/community.js', 'js/fx.js'];
     scripts.forEach(src => {
       const s = document.createElement('script');
       s.src = src;
+      s.async = false; // keep list order (static scheme data must load before yojna.js)
       s.onerror = () => console.error('Script failed to load:', src);
       document.body.appendChild(s);
     });
