@@ -21,6 +21,11 @@
 (function () {
   'use strict';
 
+  // ⚙️ STATIC SWITCH — true = curtain hamesha khula rahega (server se kuch nahi poochta,
+  // Render sleep/wakeup se koi fark nahi). Ceremony wapas chalu karni ho to false kar do
+  // (ya backup intro.js upload kar do).
+  const STATIC_OPEN = true;
+
   const UNLOCK_PARAM = 'vp';
   const STATUS_URL = '/api/inaugurate/status';
   const VERIFY_URL = '/api/inaugurate/verify';
@@ -254,6 +259,8 @@
     const overlay=build();
     // Insert immediately so the curtain covers the navbar and entire page from frame 1.
     document.body.insertBefore(overlay,document.body.firstChild);
+
+    if (STATIC_OPEN) { revealInstantly(overlay); return; }
 
     let status={ unlocked:false };
     try{
